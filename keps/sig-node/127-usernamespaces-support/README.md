@@ -83,12 +83,21 @@ tags, and then generate with `hack/update-toc.sh`.
   - [Goals](#goals)
   - [Non-Goals](#non-goals)
 - [Proposal](#proposal)
-  - [User Stories (Optional)](#user-stories-optional)
+  - [User Stories](#user-stories)
     - [Story 1](#story-1)
     - [Story 2](#story-2)
-  - [Notes/Constraints/Caveats (Optional)](#notesconstraintscaveats-optional)
+    - [Story 3](#story-3)
+  - [Notes/Constraints/Caveats](#notesconstraintscaveats)
+    - [Volumes](#volumes)
+    - [Container Runtime Support](#container-runtime-support)
   - [Risks and Mitigations](#risks-and-mitigations)
+    - [Capabilities](#capabilities)
+    - [Privileged Containers](#privileged-containers)
+    - [Sharing Host Namespaces](#sharing-host-namespaces)
+    - [Volumes](#volumes)
 - [Design Details](#design-details)
+  - [Summary of the Proposed Changes](#summary-of-the-proposed-changes)
+  - [CRI API Changes](#cri-api-changes)
   - [Test Plan](#test-plan)
   - [Graduation Criteria](#graduation-criteria)
   - [Upgrade / Downgrade Strategy](#upgrade--downgrade-strategy)
@@ -104,6 +113,7 @@ tags, and then generate with `hack/update-toc.sh`.
 - [Drawbacks](#drawbacks)
 - [Alternatives](#alternatives)
 - [Infrastructure Needed (Optional)](#infrastructure-needed-optional)
+- [References](#references)
 <!-- /toc -->
 
 ## Release Signoff Checklist
@@ -222,7 +232,7 @@ What is out of scope for this KEP? Listing non-goals helps to focus discussion
 and make progress.
 -->
 
-- To have different uid/gid mappings per pod/container. All pods/containers
+- To have different UID/GID mappings per pod/container. All pods/containers
 running in a node share a common user namespace remapping configuration.
 - Remote volumes support e.g. NFS.
 
@@ -236,7 +246,48 @@ implementation. The "Design Details" section below is for the real
 nitty-gritty.
 -->
 
-### User Stories (Optional)
+This proposal aims to support user namespaces in Kubernetes.
+As done with other namespaces, each pod will be placed in its own user namespace
+(shared among all containers in the Pod). The Pod specification will be extended
+with a new `userHostNamespace` field to allow sharing the host user namespace.
+
+Linux user namespaces allow to map different ranges of IDs between the container
+and the host.
+According to the general Linux convention, each mapping range consists of three
+parts:
+1. Container ID: First ID of the range in the container namespace mapped to the
+   host.
+2. Host ID: First ID of the range on the host mapped to the container.
+3. Length: Total number of consecutive IDs mapped between host and container
+   user namespaces, starting from the first one (including) mentioned above.
+
+The implementation of user namespaces support is divided in two phases, this
+proposal covers the first one: implement support for a _single_  UID/GIDs
+mapping for all the pods. In other words, two pods on the same node will use the
+same range of effective UID/GIDs in the node.
+A second one would consider having different IDs mapping per Pod.
+Even if that would be nice to provide the full support on a single phase, that
+will bring a broad discussion and the risk of losing the focus and failing to
+deliver this feature.
+The proposal for the first phase tries to take into consideration changes needed
+for the second phase in the different interfaces like the CRI to avoid further
+API breaking changes in the second phase.
+
+The mappings used in the first phase are controlled by the `uid-mapping` and
+`gid-mapping` kubelet flags. The format of such flags is
+`container_id0:host_id0:length0,container_id1:host_id1:length1:...`. As an
+example, `--uid-mapping="0:1000:10"` maps user IDs 0 to 9 inside the container
+to user IDs 1000 to 1009 on the host.
+The IDs mappings are configured in the kubelet and not in the container runtime
+(as done in previous proposals) because kubelet will support different IDs
+mappings per Pod in the second phase. It means that the proposed CRI extension
+already considers the second phase.
+
+The user namespace feature will be controlled by the `UserNamespaceSupport`
+Kubelet feature-gate, if this is `false` the user namespace will be shared with
+the host, keeping the current behaviour.
+
+### User Stories
 
 <!--
 Detail the things that people will be able to do if this KEP is implemented.
@@ -247,9 +298,20 @@ bogged down.
 
 #### Story 1
 
+As a cluster admin, I want to protect the node from the rogue container
+process(es) running inside pod containers with root privileges, so if a process is able to break out into the host, the effective user ID on the host is unprivileged.
+
 #### Story 2
 
-### Notes/Constraints/Caveats (Optional)
+As a cluster admin, I want to support all the images irrespective of what
+user/group that image is using.
+
+#### Story 3
+
+As a cluster admin, I want to allow some pods to disable user namespaces if they
+require elevated privileges.
+
+### Notes/Constraints/Caveats
 
 <!--
 What are the caveats to the proposal?
@@ -257,6 +319,58 @@ What are some important details that didn't come across above?
 Go in to as much detail as necessary here.
 This might be a good place to talk about core concepts and how they relate.
 -->
+
+We haven't considered the validations so far, `runAsUser` not in a valid range and so on.
+
+#### Volumes
+
+TODO(Mauricio): Drop this completely and avoid supporting volumes at all?
+
+TODO(mauricio): Add some more introductory material here
+
+Kubelet must ensure that Pods are able to access the files in the volumes.
+Currently it's done by changing the group owner of the files to match the
+`fsGroup` when it's present in the Pod specification.
+
+This proposal extends that logic, if `fsGroup` is specified it's assumed to be
+the correct GID (the group owner of the files) in the host.
+The same mechanism to change the group owners of the files is used but the
+`fsGroup` ID is not remapped, i.e. an 1-to-1 mapping entry  for the `fsGroup` is
+added to the GID mappings in the Pod.
+
+If `fsGroup` is not specified, the owner of the files is changed to the mapped
+UID and GID in the host.
+This feature is only available in some volumes plugins, the ones calling
+[`SetVolumeOwnership`](https://github.com/kubernetes/kubernetes/blob/00da04ba23d755d02a78d5021996489ace96aa4d/pkg/volume/volume_linux.go#L42).
+
+We are aware that this solution is not perfect nor optimal because changing the
+owners in big volumes takes a lot of time. The same
+[issue](https://github.com/kubernetes/kubernetes/pull/88488) is already present,
+however it gets worst with user namespaces because the chown operation has to be
+performed in more cases.
+Unfortunately the kernel is missing a feature that could solve this.
+The following are some ideas that could improve this support.
+
+- [shiftfs: uid/gid shifting filesystem](https://lwn.net/Articles/757650/)
+- [A new API for mounting filesystems](https://lwn.net/Articles/753473/)
+- [User namespace support for NFS by Sargun](https://github.com/sargun/linux/commits/nflx-v4.9)
+- [user_namespace: introduce fsid mappings](https://lwn.net/Articles/812221/)
+
+#### Container Runtime Support
+
+- Docker: It supports a shared IDs mapping for all the containers running
+  in the host. More details on [Isolate containers with a user
+  namespace](https://docs.docker.com/engine/security/userns-remap/).
+  - The ID mappings are configured using the `userns-remap` in the docker
+    daemon. This configuration should match the one used in kubelet.
+  - There is not support for [multiple ID
+    mappings](https://github.com/moby/moby/issues/28593) in Docker. How
+    this could affect and shape this proposal is still a disussion to be done.
+- containerd: It's quite straigtforward to implement the CRI changes proposed
+  below in containerd/cri, we did in this PoC.
+
+TODO(mauricio): Add link
+- cri-o: We haven't investigated in detail yet.
 
 ### Risks and Mitigations
 
@@ -272,6 +386,79 @@ How will UX be reviewed, and by whom?
 Consider including folks who also work outside the SIG or subproject.
 -->
 
+The main risk is breaking existing workloads that don't work with user namespaces.
+There are some cases that are not compatible (or have known issues) with user
+namespaces:
+
+- Capabilities like `SYS_TIME`, `SYS_MODULE`, `MKNOD`, etc.
+- Sharing host namespaces like NET, IPC, PID, etc.
+- Privileged containers.
+- Volumes without `chown` support.
+
+[#31169](https://github.com/kubernetes/kubernetes/pull/31169) introduced the
+`ExperimentalHostUserNamespaceDefaultingGate` feature gate that forces to share
+the host user namespace when any of the above features is present in the Pod
+specification (please notice that it is not working after the switch to CRI
+[76982](https://github.com/kubernetes/kubernetes/issues/76982)).
+This KEP intends to use that behaviour to avoid breaking existing workloads.
+It proposes to rename the above flag (or create a new one)
+`DisableHostUserNamespaceDefaulting`, the mechanism is used by default in alpha
+to avoid breaking existing workloads and users can disable it to enforce Pods to
+be placed in new user namespaces if `userHostNamespace: true` is not present. If
+the feature flag is `true` (the mechanism is disabled), the pod will be placed
+in a new user namespace without performing any validation check in that
+regarding.
+The motivation for this mechanism is that it will  provide time for the users to
+update their templates (explicitly setting `userHostNamespace: true`) and it
+will also allow the developers to investigate more in detail those limitations.
+
+The following of this section brings more details about why those features
+cannot be used with user namespaces.
+
+#### Capabilities
+
+The Linux kernel takes into consideration the user namespace a process is
+running in while performing the capabilitis check:
+
+> Having a capability inside a user namespace permits a process to
+perform operations (that require privilege) only on resources
+governed by that namespace.  In other words, having a capability in a
+user namespace permits a process to perform privileged operations on
+resources that are governed by (nonuser) namespaces owned by
+(associated with) the user namespace (see the next subsection).
+
+> On the other hand, there are many privileged operations that affect
+resources that are not associated with any namespace type, for
+example, changing the system (i.e., calendar) time (governed by
+CAP_SYS_TIME), loading a kernel module (governed by CAP_SYS_MODULE),
+and creating a device (governed by CAP_MKNOD).  Only a process with
+privileges in the initial user namespace can perform such operations.
+
+#### Privileged Containers
+
+Privileged containers have all the capabilities added, for the same above reason
+they cannot work together with user namespaces.
+
+#### Sharing Host Namespaces
+
+> When a nonuser namespace is created, it is owned by the user
+namespace in which the creating process was a member at the time of
+the creation of the namespace.  Privileged operations on resources
+governed by the nonuser namespace require that the process has the
+necessary capabilities in the user namespace that owns the nonuser
+namespace.
+
+In other words, if an application wants to perform a privileged operation in a host shared non-usernamesace it needs to have the necessary capabilities in the **host** usernamespace.
+It means that pods sharing host namespaces like IPC, NET or PID but not sharing the host user namespace could not work. Infact, it's not possible to share the host network namespace without sharing the user namespace in [Docker](https://github.com/moby/moby/blob/88241b99893cce78a7734a19b38d468d0dcb6156/daemon/daemon_unix.go#L696) or [runc](https://github.com/opencontainers/runc/issues/799) at the time of writing this proposal.
+
+#### Volumes
+
+There are volumes that don't support changing the user of a file, i.e. the ones
+not using
+[`SetVolumeOwnership`](https://github.com/kubernetes/kubernetes/blob/00da04ba23d755d02a78d5021996489ace96aa4d/pkg/volume/volume_linux.go#L42),
+in these cases the user namespace should be shared with the host to avoid access
+problems.
+
 ## Design Details
 
 <!--
@@ -280,6 +467,62 @@ change are understandable. This may include API specs (though not always
 required) or even code snippets. If there's any ambiguity about HOW your
 proposal will be implemented, this is the place to discuss them.
 -->
+### Summary of the Proposed Changes
+
+- Add a `userHostNamespace` bool field to the Pod spec to allow sharing the host
+  user namespace.
+- Add `uid-mapping` and `gid-mapping` flags to kubelet to configure a per
+  cluster ID mappings.
+- Extend the CRI with a user namespace mode and the ID mappings.
+- Add a `UserNamespaceSupport` feature flag to enable / disable the user
+  namespaces support.
+- Update owner of volumes mounted in `/var/lib/kubelet/pods/xxx/volumes`.
+- Implement a defaulting to host user namespace mechanism based to the already
+  existing (and broken) `ExperimentalHostUserNamespaceDefaultingGate` feature
+  gate.
+
+### CRI API Changes
+
+The CRI has to be extended to allow kubelet to specify the user namespace mode
+and the ID mappings for a Pod. The
+[`NamespaceOption`](https://github.com/kubernetes/cri-api/blob/1eae59a7c4dee45a900f54ea2502edff7e57fd68/pkg/apis/runtime/v1alpha2/api.proto#L228)
+is extended with two new fields:
+- A `user` `NamespaceMode` that defines if the Pod should run in an independent
+  user namespace (`POD` mode) or if it should share the host user namespace
+  (`NODE` mode).
+- The ID mappings to be used if the user namespace mode is `POD`.
+
+```
+// LinuxIDMapping represents a single user namespace mapping in Linux.
+message LinuxIDMapping {
+   // container_id is the starting ID for the mapping inside the container.
+   uint32 container_id = 1;
+   // host_id is the starting ID for the mapping on the host.
+   uint32 host_id = 2;
+   // number of IDs in this mapping.
+   uint32 length = 3;
+}
+
+// LinuxUserNamespaceConfig represents the user and group id mappings in Linux.
+message LinuxUserNamespaceConfig {
+   // uid_mappings is an array of user ID mappings.
+   repeated LinuxIDMapping uid_mappings = 1;
+   // gid_mappings is an array of group ID mappings.
+   repeated LinuxIDMapping gid_mappings = 2;
+}
+
+// NamespaceOption provides options for Linux namespaces.
+message NamespaceOption {
+    ...
+    // User namespace for this container/sandbox.
+    // Note: There is currently no way to set CONTAINER scoped user namespace in the Kubernetes API.
+    // POD is the default value. Kubelet will set it to NODE when trying to use host user namespace.
+    // Namespaces currently set by the kubelet: POD, NODE
+    Namespace user = 5;
+    // ID mappings to use when the user namespace mode is POD.
+    LinuxUserNamespaceConfig mappings = 6;
+}
+```
 
 ### Test Plan
 
@@ -418,9 +661,9 @@ you need any help or guidance.
 _This section must be completed when targeting alpha to a release._
 
 * **How can this feature be enabled / disabled in a live cluster?**
-  - [ ] Feature gate (also fill in values in `kep.yaml`)
-    - Feature gate name:
-    - Components depending on the feature gate:
+  - [X] Feature gate (also fill in values in `kep.yaml`)
+    - Feature gate name: UserNamespaceSupport
+    - Components depending on the feature gate: kubelet
   - [ ] Other
     - Describe the mechanism:
     - Will enabling / disabling the feature require downtime of the control
@@ -429,8 +672,7 @@ _This section must be completed when targeting alpha to a release._
       of a node? (Do not assume `Dynamic Kubelet Config` feature is enabled).
 
 * **Does enabling the feature change any default behavior?**
-  Any change of default behavior may be surprising to users or break existing
-  automations, so be extremely careful here.
+  Yes, pods will be put into a new user namespace.
 
 * **Can the feature be disabled once it has been enabled (i.e. can we roll back
   the enablement)?**
@@ -621,6 +863,13 @@ not need to be as detailed as the proposal, but should include enough
 information to express the idea and why it was not acceptable.
 -->
 
+The previous [design
+proposal](https://github.com/kubernetes/community/blob/master/contributors/design-proposals/node/node-usernamespace-remapping.md)
+proposed to configure the ID mappings in the container runtime instead of the
+kubelet.
+This proposal considers that it's better to configure it in the kubelet because
+it'll be the one choosing these ID mappings for each Pod in the future.
+
 ## Infrastructure Needed (Optional)
 
 <!--
@@ -628,3 +877,20 @@ Use this section if you need things from the project/SIG. Examples include a
 new subproject, repos requested, or GitHub details. Listing these here allows a
 SIG to get the process for these resources started right away.
 -->
+
+## References
+
+- Support Node-Level User Namespaces Remapping design proposal document.
+  - https://github.com/kubernetes/community/blob/master/contributors/design-proposals/node/node-usernamespace-remapping.md
+- Node-Level UserNamespace implementation
+  - https://github.com/kubernetes/kubernetes/pull/64005
+- Support node-level user namespace remapping
+  - https://github.com/kubernetes/enhancements/issues/127
+- Default host user namespace via experimental flag
+  - https://github.com/kubernetes/kubernetes/pull/31169
+- Add support for experimental-userns-remap-root-uid and
+  experimental-userns-remap-root-gid options to match the remapping used by the
+  container runtime
+  - https://github.com/kubernetes/kubernetes/pull/55707
+- Track Linux User Namespaces in the Pod Security Policy
+  - https://github.com/kubernetes/kubernetes/issues/59152

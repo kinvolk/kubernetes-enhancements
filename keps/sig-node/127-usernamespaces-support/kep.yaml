@@ -12,3 +12,7 @@ reviewers:
   - "@mrunalp"
 approvers:
   - TBD
+feature-gates:
+  - name: UserNamespaceSupport
+    components:
+      - kubelet
