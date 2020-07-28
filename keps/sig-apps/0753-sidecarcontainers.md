@@ -1033,7 +1033,7 @@ Rodrigo will reach out to users to verify, though.
 
 #### Revisit if we want to modify the podPhase
 
-The current proposal modifies the `podPahse`. The reasoning is this (c&p from
+The current proposal modifies the `podPhase`. The reasoning is this (c&p from
 the proposal):
 
 > PodPhase will be modified to not include Sidecars in its calculations, this is so that if a sidecar exits in failure it does not mark the pod as `Failed`. It also avoids the scenario in which a Pod has RestartPolicy `OnFailure`, if the containers all successfully complete, when the sidecar gets sent the shut down signal if it exits with a non-zero code the Pod phase would be calculated as `Running` despite all containers having exited permanently.
