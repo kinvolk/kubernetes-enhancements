@@ -287,10 +287,10 @@ that updates permissions and ownership of the files to be accesible by the
 #### Container Runtime Support
 
 - **Docker**:
-  It only supports a [single IDs
-  mapping](https://docs.docker.com/engine/security/userns-remap/) shared by all
-  containers running in the host. There is not support for [multiple IDs
-  mapping](https://github.com/moby/moby/issues/28593) yet. Dockershim runtime is
+  It only supports a [single ID
+  mappings](https://docs.docker.com/engine/security/userns-remap/) shared by all
+  containers running in the host. There is not support for [multiple ID
+  mappings](https://github.com/moby/moby/issues/28593) yet. Dockershim runtime is
   only compatible with pods running in `Host` and `Cluster` modes. The user has
   to guarantee that the ID mappings configured in Docker through the
   `userns-remap` and the cluster-wide range configured in the Kubelet are the
