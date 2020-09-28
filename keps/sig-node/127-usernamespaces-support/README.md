@@ -760,7 +760,7 @@ The container runtime will have to be updated in the nodes to support this featu
 
 The new `user` field in the `NamespaceOption` will be ignored by an old runtime
 without user namespaces support. The container will be placed in the host user
-namespace. It's a responsibility of the user to guarante that a runtime
+namespace. It's a responsibility of the user to guarantee that a runtime
 supporting user namespaces is used.
 
 An old version of kubelet without user namespaces support can cause some
