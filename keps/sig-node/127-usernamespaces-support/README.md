@@ -227,7 +227,7 @@ host. If such a process is able to break into the host, it'll have limited
 impact as it'll be running as an unprivileged user there.
 
 The following security vulnerabilities are mitigated with
-user namespaces and it is expected that using user namespaces would mitigate against some of the future vulnerabilities. Some examples are:
+user namespaces and it is expected that using them would mitigate against some of the future vulnerabilities.
 - CVE-2016-8867: Privilege escalation inside containers
   - https://github.com/moby/moby/issues/27590
 - CVE-2018-15664: TOCTOU race attack that allows to read/write files in the host
