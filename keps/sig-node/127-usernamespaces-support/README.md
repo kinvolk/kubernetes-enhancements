@@ -312,7 +312,7 @@ Docker only supports a [single ID
   [this](https://github.com/kinvolk/containerd-cri/commits/mauricio/userns_poc)
   PoC.
 - **cri-o**:
-  It recently [added](https://github.com/cri-o/cri-o/pull/3944) support for
+CRI-O recently [added](https://github.com/cri-o/cri-o/pull/3944) support for
   user namespaces through a pod annotation. The extensions to make it work with
   the current CRI changes are small.
 - TODO(Mauricio): gVisor, katacontainers?
