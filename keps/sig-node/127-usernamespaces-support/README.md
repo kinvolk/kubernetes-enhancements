@@ -335,7 +335,7 @@ the host change.
 
 This proposal supports volume without changing the user and group IDs and leaves
 that problem to the user to manage. Future Linux kernel features such as shiftfs
-could allow to different pods to see a volume with its own IDs but it is out of
+could allow different pods to see a volume with its own IDs but it is out of
 scope of this proposal. Among the possible future kernel solutions, we can list:
 
 - [shiftfs: uid/gid shifting filesystem](https://lwn.net/Articles/757650/)
@@ -517,7 +517,7 @@ this feature.
 ### Future Phases
 
 These phase aims to implement the `Pod` mode. After this phase is completed the
-full advantanges of user namespaces could be used in some cases (stateless
+full advantanges of user namespaces can be used in some cases (stateless
 workloads).
 
 There are some things that have to be studied with more detail for these
@@ -527,7 +527,7 @@ phase(s) but are not needed for phase 1, hence they are not discussed in detail:
   It's not clear yet what should be the process to make this happen as this is a
   potentially non backwards compatible change. It's specially relevant for
   workloads not compatible with user namespaces. A [host defaulting
-  mechanishm](#host-defaulting-mechanishm) could help to make this transiction
+  mechanishm](#host-defaulting-mechanishm) can help to make this transiction
   smoother.
 - **Duplicated Snapshots of Container Images**:
   It's not clear when and how this support will land in the Linux Kernel.
@@ -546,7 +546,7 @@ phase(s) but are not needed for phase 1, hence they are not discussed in detail:
   perform a kind of DOS allocating too many IDs for a given container.
 - **Security Considerations**:
   Once `Pod` is the default mode, it is needed to control who can use `Host` and
-  `Cluster` modes. This could be done through Pod Security Policies if they are
+  `Cluster` modes. This can be done through Pod Security Policies if they are
   available at that time.
 
 ## Design Details
@@ -761,8 +761,8 @@ without user namespaces support. The container will be placed in the host user
 namespace. It's a responsibility of the user to guarante that a runtime
 supporting user namespaces is used.
 
-If an old version of kubelet without user namespaces support could cause some
-issues too. In this case the runtime could wrongly infer that the `user` field
+An old version of kubelet without user namespaces support can cause some
+issues too. In this case the runtime can wrongly infer that the `user` field
 is set to `POD` in the `NamespaceOption` message. To avoid this problem the
 runtime should check if the `mappings` field contains any mappings, an error
 should be raised otherwise.
@@ -808,12 +808,12 @@ you need any help or guidance.
   Yes, by disabling the `UserNamespacesSupport` feature gate.
   The effective user and group IDs of the process in the host would be different
   before and after disabling the feature for pods running in `Cluster` and `Pod`
-  modes. This could cause access issues to pods accessing files saved in
+  modes. This can cause access issues to pods accessing files saved in
   volumes.
 
 * **What happens if we reenable the feature if it was previously rolled back?**
   The situation is very similar to the described above. The pod will be able to
-  access the files written when the feature was enabled but could have issues to
+  access the files written when the feature was enabled but can have issues to
   access those files written while the feature was disabled.
 
 * **Are there any tests for feature enablement/disablement?**
