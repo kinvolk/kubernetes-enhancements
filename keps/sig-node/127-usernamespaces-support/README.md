@@ -186,12 +186,18 @@ to make containers secure. User namespaces isolate user and group IDs by
 allowing processes to run with different IDs in the container and in the host.
 Specially, a process running as privileged in a container can be
 unprivileged in the host. This makes it possible to give more capabilities to the containers and
-protects the host from malicious or compromised containers.
+protects the host and other containers from malicious or compromised containers.
 
-This KEP is a continuation of the work initiated in the [Support Node-Level User
+This KEP adds a new `userNamespaceMode` field  to `pod.Spec`. It allows users to
+place pods in different user namespaces increasing the  pod-to-pod and
+pod-to-host isolation. This extra isolation increases the cluster security as it
+protects the host and other pods from malicious or compromised processes inside
+containers that are able to break into the host. This KEP proposes three
+different modes: `Host` keeps the current behaviour, `Cluster` uses the same
+ID mapping for all the pods (very similar to the previous [Support Node-Level User
 Namespaces
 Remapping](https://github.com/kubernetes/community/blob/master/contributors/design-proposals/node/node-usernamespace-remapping.md)
-proposal.
+proposal) and `Pod` increases pod-to-pod isolation.
 
 ## Motivation
 
