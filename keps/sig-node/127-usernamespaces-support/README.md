@@ -245,7 +245,7 @@ capability to give any extra privilege on the host.
 #### Story 2
 
 As a cluster admin, I want to allow some pods to share the host user namespace
-if they need a feature only available in such user namespace.
+if they need a feature only available in such user namespace, such as loading a kernel module with `CAP_SYS_MODULE`.
 
 ### Notes/Constraints/Caveats
 
