@@ -253,7 +253,7 @@ if they need a feature only available in such user namespace, such as loading a 
 
 The Linux kernel uses the effective user and group IDs (the ones the host) to
 check the file access permissions. Since with user namespaces IDs are mapped to
-a different value on the host, this could cause issues accessing volumes if the
+a different value on the host, this causes issues accessing volumes if the
 pod is run with a different mapping, i.e. the effective user and group IDs on
 the host change.
 
