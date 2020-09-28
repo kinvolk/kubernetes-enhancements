@@ -449,6 +449,12 @@ Some features that could not work when the host user namespace is not shared are
     that does not own the network namespace. Impact: pods with
     `hostNetwork=true` and `userNamespaceMode=Pod|Cluster` can fail.
 
+  If users specify `userNamespaceMode=Pod|Cluster` and one of these
+  `host{IPC,PID,Network}=true` options, runc will currently fail to start the
+  container. The kubelet does **not** try to prevent that combination of options,
+  in case runc or the kernel make it possible in the future to use that
+  combination.
+
 In order to avoid breaking existing workloads `Host` is the default value of `userNamespaceMode`.
 
 #### Duplicated Snapshots of Container Images
@@ -512,7 +518,7 @@ this feature.
 
 ### Future Phases
 
-These phase aims to implement the `Pod` mode. After this phase is completed the
+These phases aim to implement the `Pod` mode. After this phase is completed the
 full advantanges of user namespaces can be used in some cases (stateless
 workloads).
 
