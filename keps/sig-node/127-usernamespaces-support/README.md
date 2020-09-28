@@ -331,6 +331,17 @@ Some features that could not work when the host user namespace is not shared are
   capabilities that are only available in the root (host) user namespace such as
   `CAP_SYS_TIME`, `CAP_SYS_MODULE` & `CAP_MKNOD`.
 
+  If a pod is given one of those capabilities it will still be deployed, but the
+  capability will be ineffective and processes using those capabilities will
+  fail. This is not impacting the implementation in Kubernetes. If users need
+  the capability to be effective, they should use `userNamespaceMode=Host`.
+
+  The list of such capabilities is likely to change from one Linux version to
+  another. For example, Linux now has [time
+  namespaces](https://man7.org/linux/man-pages/man7/time_namespaces.7.html) and
+  there are ways to make `CAP_SYS_TIME` work inside a user namespace. There are
+  also discussions to make `CAP_MKNOD` work in user namespaces.
+
 - **Sharing Host Namespaces**:
   There are some limitations in the Linux kernel and in the runtimes that
   prevents sharing other host namespaces when the host user namespace is not
