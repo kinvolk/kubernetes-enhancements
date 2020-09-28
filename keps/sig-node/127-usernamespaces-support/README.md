@@ -195,7 +195,15 @@ user namespaces and it is expected that using user namespaces would mitigate aga
 
 ### Non-Goals
 
-TODO(Mauricio)
+- Provide a way to run the Kubelet process or container runtimes as an
+  unprivileged process. Although initiatives like
+  [usernetes](https://github.com/rootless-containers/usernetes) and this KEP
+  both make use of user namespaces, it is a different implementation for a
+  different purpose.
+- Mounting volumes in pods with a user ID mapping. Although the authors of this
+  KEP would like to have this feature in the future, this is out of scope of
+  this KEP. The complexity of this would probably require to write a separate
+  KEP.
 
 ## Proposal
 
