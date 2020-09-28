@@ -296,7 +296,7 @@ that updates permissions and ownership of the files to be accesible by the
 #### Container Runtime Support
 
 - **Docker**:
-  It only supports a [single ID
+Docker only supports a [single ID
   mappings](https://docs.docker.com/engine/security/userns-remap/) shared by all
   containers running in the host. There is not support for [multiple ID
   mappings](https://github.com/moby/moby/issues/28593) yet. Dockershim runtime
