@@ -60,6 +60,22 @@ SIG Architecture for cross-cutting KEPs).
 -->
 # KEP-127: Support User Namespaces
 
+<!--
+This is the title of your KEP. Keep it short, simple, and descriptive. A good
+title can help communicate what the KEP is and should be considered as part of
+any review.
+-->
+
+<!--
+A table of contents is helpful for quickly jumping to sections of a KEP and for
+highlighting any additional information provided beyond the standard KEP
+template.
+
+Ensure the TOC is wrapped with
+  <code>&lt;!-- toc --&rt;&lt;!-- /toc --&rt;</code>
+tags, and then generate with `hack/update-toc.sh`.
+-->
+
 <!-- toc -->
 - [Release Signoff Checklist](#release-signoff-checklist)
 - [Summary](#summary)
@@ -146,6 +162,25 @@ Items marked with (R) are required *prior to targeting to a milestone / release*
 
 ## Summary
 
+<!--
+This section is incredibly important for producing high-quality, user-focused
+documentation such as release notes or a development roadmap. It should be
+possible to collect this information before implementation begins, in order to
+avoid requiring implementors to split their attention between writing release
+notes and implementing the feature itself. KEP editors and SIG Docs
+should help to ensure that the tone and content of the `Summary` section is
+useful for a wide audience.
+
+A good summary is probably at least a paragraph in length.
+
+Both in this section and below, follow the guidelines of the [documentation
+style guide]. In particular, wrap lines to a reasonable length, to make it
+easier for reviewers to cite specific portions, and to minimize diff churn on
+updates.
+
+[documentation style guide]: https://github.com/kubernetes/community/blob/master/contributors/guide/style-guide.md
+-->
+
 Container security consists of many different kernel features that work together
 to make containers secure. User namespaces isolate user and group IDs by
 allowing processes to run with different IDs in the container and in the host.
@@ -159,6 +194,15 @@ Remapping](https://github.com/kubernetes/community/blob/master/contributors/desi
 proposal.
 
 ## Motivation
+
+<!--
+This section is for explicitly listing the motivation, goals and non-goals of
+this KEP.  Describe why the change is important and the benefits to users. The
+motivation section can optionally provide links to [experience reports] to
+demonstrate the interest in a KEP within the wider Kubernetes community.
+
+[experience reports]: https://github.com/golang/go/wiki/ExperienceReports
+-->
 
 From [user_namespaces(7)](https://man7.org/linux/man-pages/man7/user_namespaces.7.html):
 > User namespaces isolate security-related identifiers and attributes, in
@@ -187,6 +231,11 @@ user namespaces and it is expected that using user namespaces would mitigate aga
 
 ### Goals
 
+<!--
+List the specific goals of the KEP. What is it trying to achieve? How will we
+know that this has succeeded?
+-->
+
 - Increase node to pod isolation in Kubernetes by mapping user and group IDs
   inside the container to different IDs in the host. In particular, mapping root
   inside the container to unprivileged user and group IDs in the node.
@@ -194,6 +243,11 @@ user namespaces and it is expected that using user namespaces would mitigate aga
 - Benefit from the security hardening that user namespaces are expected to provide against some of the future unknown runtime vulnerabilities
 
 ### Non-Goals
+
+<!--
+What is out of scope for this KEP? Listing non-goals helps to focus discussion
+and make progress.
+-->
 
 - Provide a way to run the Kubelet process or container runtimes as an
   unprivileged process. Although initiatives like
@@ -206,6 +260,14 @@ user namespaces and it is expected that using user namespaces would mitigate aga
   KEP.
 
 ## Proposal
+
+<!--
+This is where we get down to the specifics of what the proposal actually is.
+This should have enough detail that reviewers can understand exactly what
+you're proposing, but should not include things like API designs or
+implementation. The "Design Details" section below is for the real
+nitty-gritty.
+-->
 
 This proposal aims to support user namespaces in Kubernetes by extending the pod
 specification with a new `userNamespaceMode` field. This field can have 3 values:
@@ -235,6 +297,13 @@ specification with a new `userNamespaceMode` field. This field can have 3 values
 
 ### User Stories
 
+<!--
+Detail the things that people will be able to do if this KEP is implemented.
+Include as much detail as possible so that people can understand the "how" of
+the system. The goal here is to make this feel real for users without getting
+bogged down.
+-->
+
 #### Story 1
 
 As a cluster admin, I want run some pods with privileged capabilities because
@@ -248,6 +317,13 @@ As a cluster admin, I want to allow some pods to share the host user namespace
 if they need a feature only available in such user namespace, such as loading a kernel module with `CAP_SYS_MODULE`.
 
 ### Notes/Constraints/Caveats
+
+<!--
+What are the caveats to the proposal?
+What are some important details that didn't come across above?
+Go in to as much detail as necessary here.
+This might be a good place to talk about core concepts and how they relate.
+-->
 
 #### Volumes Support
 
@@ -320,6 +396,18 @@ CRI-O recently [added](https://github.com/cri-o/cri-o/pull/3944) support for
 containerd and cri-o will provide support for the 3 possible values of `userNamespaceMode`.
 
 ### Risks and Mitigations
+
+<!--
+What are the risks of this proposal, and how do we mitigate? Think broadly.
+For example, consider both security and how this will impact the larger
+Kubernetes ecosystem.
+
+How will security be reviewed, and by whom?
+
+How will UX be reviewed, and by whom?
+
+Consider including folks who also work outside the SIG or subproject.
+-->
 
 #### Breaking Existing Workloads
 
@@ -458,6 +546,14 @@ phase(s) but are not needed for phase 1, hence they are not discussed in detail:
 
 ## Design Details
 
+<!--
+This section should contain enough information that the specifics of your
+change are understandable. This may include API specs (though not always
+required) or even code snippets. If there's any ambiguity about HOW your
+proposal will be implemented, this is the place to discuss them.
+-->
+
+
 This section only focuses on phase 1 as specified above.
 
 ### Summary of the Proposed Changes
@@ -537,8 +633,6 @@ message NamespaceOption {
 
 ### Test Plan
 
-TBD
-
 <!--
 **Note:** *Not required until targeted at a release.*
 
@@ -557,17 +651,9 @@ when drafting this test plan.
 [testing-guidelines]: https://git.k8s.io/community/contributors/devel/sig-testing/testing.md
 -->
 
-### Graduation Criteria
-
 TBD
-Mauricio: Should we require Pod mode to be implemented to switch to Beta?
 
-#### Alpha -> Beta
-
-- Future Complete:
-  - `Pod` mode implemented
-
-#### Beta -> GA
+### Graduation Criteria
 
 <!--
 **Note:** *Not required until targeted at a release.*
@@ -624,6 +710,16 @@ in back-to-back releases.
 [conformance tests]: https://git.k8s.io/community/contributors/devel/sig-architecture/conformance-tests.md
 -->
 
+TBD
+Mauricio: Should we require Pod mode to be implemented to switch to Beta?
+
+#### Alpha -> Beta
+
+- Future Complete:
+  - `Pod` mode implemented
+
+#### Beta -> GA
+
 ### Upgrade / Downgrade Strategy
 
 <!--
@@ -639,6 +735,19 @@ enhancement:
 -->
 
 ### Version Skew Strategy
+
+<!--
+If applicable, how will the component handle version skew with other
+components? What are the guarantees? Make sure this is in the test plan.
+
+Consider the following in developing a version skew strategy for this
+enhancement:
+- Does this enhancement involve coordinating behavior in the control plane and
+  in the kubelet? How does an n-2 kubelet without this feature available behave
+  when this feature is used?
+- Will any other components on the node change? For example, changes to CSI,
+  CRI or CNI may require updating that component before the kubelet.
+-->
 
 The container runtime will have to be updated in the nodes to support this feature.
 
@@ -795,6 +904,12 @@ Some ideas
 - any performance issues?
 
 ## Alternatives
+
+<!--
+What other approaches did you consider, and why did you rule them out? These do
+not need to be as detailed as the proposal, but should include enough
+information to express the idea and why it was not acceptable.
+-->
 
 ### Differences with Previous Proposal
 Even if this KEP is heavily based on the previous [Support Node-Level User
