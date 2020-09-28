@@ -421,27 +421,40 @@ the `Pod` mode is out of scope in this phase because it requires a non
 negligible amount of work and we could risk losing the focus failing to deliver
 this feature.
 
-### Phase 2
+### Future Phases
 
-This phase aims to implement the `Pod` mode. After this phase is completed the
+These phase aims to implement the `Pod` mode. After this phase is completed the
 full advantanges of user namespaces could be used in some cases (stateless
 workloads).
 
-### Phase 2+
+There are some things that have to be studied with more detail for these
+phase(s) but are not needed for phase 1, hence they are not discussed in detail:
 
-The default value of `userNamespaceMode` should be set to `Pod` so pods that
-don't set this field can also get the security benefits of user namespaces. It's
-not clear yet what should be the process to make this happen as this is a
-potentially non backwards compatible change. It's specially relevant for
-workloads not compatible with user namespaces.
-
-A [host defaulting mechanishm](#host-defaulting-mechanishm) could help to make
-this transiction smoother, but this proposal doesn't go into details as it
-mainly focuses in phase 1.
-
-TODO(Mauricio):
-- Should we describe that once the default is Pod we should implement a control for it on PSP / OPA?
-- Should we mention that it's possible that users in future would be able to set the mappings?
+- **Pod Default Mode**:
+  It's not clear yet what should be the process to make this happen as this is a
+  potentially non backwards compatible change. It's specially relevant for
+  workloads not compatible with user namespaces. A [host defaulting
+  mechanishm](#host-defaulting-mechanishm) could help to make this transiction
+  smoother.
+- **Duplicated Snapshots of Container Images**:
+  It's not clear when and how this support will land in the Linux Kernel.
+- **ID Mappings Allocation Algorithm**
+  The `Pod` mode requires to have each pod in different and non-overlapping ID mapping. It requires to implement an algorithm that performs that allocation. There are some open questions about it:
+    - What should be the length of the mapping assigned to each Pod?
+    - How to get the ID mapping range of a running Pod when kubelet crashes?
+    - Can the user specify the ID mappings for a pod?
+- **High IDs in Container Images**:
+  The IDs present on the image are not available as image metadata. The runtimes
+  would have to perform an image check, like analysing the `/etc/password` file,
+  to discover what those IDs are. The kubelet and the CRI will require some
+  changes to make this information available to the ID mappings allocator
+  algorithm. It would have to be sure that the allocated mappings include those
+  IDs and should have some logic to protect against special crafted images to
+  perform a kind of DOS allocating too many IDs for a given container.
+- **Security Considerations**:
+  Once `Pod` is the default mode, it is needed to control who can use `Host` and
+  `Cluster` modes. This could be done through Pod Security Policies if they are
+  available at that time.
 
 ## Design Details
 
