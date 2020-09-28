@@ -344,9 +344,17 @@ Some features that could not work when the host user namespace is not shared are
 
 - **Sharing Host Namespaces**:
   There are some limitations in the Linux kernel and in the runtimes that
-  prevents sharing other host namespaces when the host user namespace is not
+  prevent sharing other host namespaces when the host user namespace is not
   shared.
-  TODO(Mauricio): Put links to those limitations?
+  - Mounting `mqueue` (`/dev/mqueue`) is not allowed from a process in a user
+    namespace that does not own the IPC namespace. Pods with `hostIPC=true` and
+    `userNamespaceMode=Pod|Cluster` can fail.
+  - Mounting `procfs` (`/proc`) is not allowed from a process in a user namespace
+    that does not own the PID namespace. Pods with `hostPID=true` and
+    `userNamespaceMode=Pod|Cluster` can fail.
+  - Mounting `sysfs` (`/sys`) is not allowed from a process in a user namespace
+    that does not own the network namespace. Impact: pods with
+    `hostNetwork=true` and `userNamespaceMode=Pod|Cluster` can fail.
 
 In order to avoid breaking existing workloads `Host` is the default value of `userNamespaceMode`.
 
