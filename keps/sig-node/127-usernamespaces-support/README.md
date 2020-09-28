@@ -518,7 +518,7 @@ this feature.
 
 ### Future Phases
 
-These phases aim to implement the `Pod` mode. After this phase is completed the
+These phases aim to implement the `Pod` mode. After these phases are completed the
 full advantanges of user namespaces can be used in some cases (stateless
 workloads).
 
