@@ -172,7 +172,7 @@ namespace.
 
 The goal of supporting user namespaces in Kubernetes is to be able to run
 processes in pods with a different user and group IDs than in the host.
-Speficically, a privileged process in the pod runs as an unprivileged process in the
+Specifically, a privileged process in the pod runs as an unprivileged process in the
 host. If such a process is able to break into the host, it'll have limited
 impact as it'll be running as an unprivileged user there.
 
