@@ -198,8 +198,7 @@ TODO(Mauricio)
 ## Proposal
 
 This proposal aims to support user namespaces in Kubernetes by extending the pod
-specification with a new `userNamespaceMode` field. This proposal aims to
-support three modes.
+specification with a new `userNamespaceMode` field. This field can have 3 values:
 
 - **Host**:
   The pods are placed in the host user namespace, this is the current Kubernetes
@@ -290,13 +289,13 @@ that updates permissions and ownership of the files to be accesible by the
   It only supports a [single ID
   mappings](https://docs.docker.com/engine/security/userns-remap/) shared by all
   containers running in the host. There is not support for [multiple ID
-  mappings](https://github.com/moby/moby/issues/28593) yet. Dockershim runtime is
-  only compatible with pods running in `Host` and `Cluster` modes. The user has
-  to guarantee that the ID mappings configured in Docker through the
-  `userns-remap` and the cluster-wide range configured in the Kubelet are the
-  same. The dockershim implementation includes a check to verify that the IDs
-  mapping received from the Kubelet are equal to the ones configured in Docker,
-  returning an error otherwise.
+  mappings](https://github.com/moby/moby/issues/28593) yet. Dockershim runtime
+  is only compatible with pods running in `Host` and `Cluster` modes. The user
+  has to guarantee that the ID mappings configured in Docker through the
+  `userns-remap` parameter and the cluster-wide range configured in the Kubelet
+  are the same. The dockershim implementation includes a check to verify that
+  the IDs mapping received from the Kubelet are equal to the ones configured in
+  Docker, returning an error otherwise.
 - **containerd**:
   It's quite straigtforward to implement the CRI changes proposed below in
   containerd/cri, we did it in
