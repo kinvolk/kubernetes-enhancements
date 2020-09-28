@@ -226,7 +226,7 @@ Specifically, a privileged process in the pod runs as an unprivileged process in
 host. If such a process is able to break into the host, it'll have limited
 impact as it'll be running as an unprivileged user there.
 
-There have been some security vulnerabilities that could have been mitigated by
+The following security vulnerabilities are mitigated with
 user namespaces and it is expected that using user namespaces would mitigate against some of the future vulnerabilities. Some examples are:
 - CVE-2016-8867: Privilege escalation inside containers
   - https://github.com/moby/moby/issues/27590
