@@ -346,20 +346,25 @@ In regard to this proposal, volumes can be divided in ephemeral and non-ephemera
 
 Ephemeral volumes are associated to a **single** pod and their lifecyle is
 dependent on that pod. These are `configMap`, `secret`, `emptyDir`,
-`downwardAPI`, etc. These kind of volumes are easy to handle as they are not
-shared by different pods and hence all the processes accessing those volumes have
-the same effective user and group IDs. Kubelet creates the files for those
-volumes and it can easily set the file ownership too.
+`downwardAPI`, etc. These kind of volumes can work with any of the three
+different modes of `userNamespaceMode` as they are not shared by different pods
+and hence all the processes accessing those volumes have the same effective user
+and group IDs. Kubelet creates the files for those volumes and it can easily set
+the file ownership too.
 
-Non-ephemeral volumes more difficult to support since they can be persistent and
-also can be shared by multiple pods. This proposal supports volumes with two
-different strategies:
+Non-ephemeral volumes are more difficult to support since they can be persistent
+and shared by multiple pods. This proposal supports volumes with two different
+strategies:
 - The `Cluster` makes it easier for pods to share files using volumes when those
   don't have access permissions for `others` because the effective user and
   group IDs on the host are the same for all the pods.
 - The semantics of semantics of `fsGroup` are respected, if it's specified it's
   assumed to be the correct GID in the host and a 1-to-1 mapping entry for the
   `fsGroup` is added to the GID mappings for the pod.
+
+This KEP doesn't impose any restriction on the different volumes and
+`userNamespaceMode` combinations and leaves it to users to chose the correct
+combinations based on their specific needs.
 
 There are some cases that require special attention from the user. For instance,
 a process inside a pod will not be able to access files with mode `0700` and
