@@ -361,15 +361,21 @@ In order to avoid breaking existing workloads `Host` is the default value of `us
 #### Duplicated Snapshots of Container Images
 
 The owners of the files of a container image have to been set accordingly to the
-ID mappings used for that container. The runtimes perform a `chown` operation
-over the image snapshot when it's pulled. This presents a risk as it potentially
-increases the time and the storage needed to handle the container images.
+ID mappings used for that container. For example, if the user 0 in the container
+is mapped to the host user 100000, then the `/root` directory has to be owned by
+user ID 100000 in the host, so it appears to belong to root in the container.
+The current implementation in container runtimes is to recursively perform a
+`chown` operation over the image snapshot when it's pulled. This presents a risk
+as it potentially increases the time and the storage needed to handle the
+container images.
 
 There is not immediate mitigation for it, [we
 talked](https://lists.linuxfoundation.org/pipermail/containers/2020-September/042230.html)
 to the Linux kernel community and [they
 replied](https://lists.linuxfoundation.org/pipermail/containers/2020-September/042230.html)
-they are working on a solution for it.
+they are working on a solution for it. If the Linux kernel provides a solution
+for this problem, that would be something that container runtimes should use. It
+does not impact the kubelet nor the CRI gRPC spec.
 
 Another risk is exausting the disk space on the nodes if pods are repeativily
 started and stopped while using `Pod` mode. Since `Pod` mode is planned for
