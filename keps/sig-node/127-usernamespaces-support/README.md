@@ -245,8 +245,10 @@ know that this has succeeded?
 - Increase node to pod isolation in Kubernetes by mapping user and group IDs
   inside the container to different IDs in the host. In particular, mapping root
   inside the container to unprivileged user and group IDs in the node.
-- Making it possible to run workloads that need "dangerous" capabilities such as `CAP_SYS_ADMIN` without impacting the host.
-- Benefit from the security hardening that user namespaces are expected to provide against some of the future unknown runtime vulnerabilities
+- Make it possible to run workloads that need "dangerous" capabilities such as
+  `CAP_SYS_ADMIN` without impacting the host.
+- Benefit from the security hardening that user namespaces are expected to
+  provide against some of the future unknown runtime vulnerabilities
 
 ### Non-Goals
 
