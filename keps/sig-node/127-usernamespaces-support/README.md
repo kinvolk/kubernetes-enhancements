@@ -422,7 +422,7 @@ Consider including folks who also work outside the SIG or subproject.
 
 #### Breaking Existing Workloads
 
-Some features that could not work when the host user namespace is not shared are:
+Some features that don't work when the host user namespace is not shared are:
 
 - **Some Capabilities**:
   The Linux kernel takes into consideration the user namespace a process is
