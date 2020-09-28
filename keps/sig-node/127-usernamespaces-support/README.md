@@ -371,6 +371,10 @@ to the Linux kernel community and [they
 replied](https://lists.linuxfoundation.org/pipermail/containers/2020-September/042230.html)
 they are working on a solution for it.
 
+If the Linux kernel provides a solution for this problem, that would be
+something that container runtimes should use. It does not impact the kubelet nor
+the CRI gRPC spec.
+
 Another risk is exausting the disk space on the nodes if pods are repeativily
 started and stopped while using `Pod` mode. Since `Pod` mode is planned for
 phase 2 we haven't considered a mitigation for this case.
