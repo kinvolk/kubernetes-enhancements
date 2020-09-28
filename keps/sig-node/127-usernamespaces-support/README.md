@@ -346,6 +346,19 @@ Another risk is exausting the disk space on the nodes if pods are repeativily
 started and stopped while using `Pod` mode. Since `Pod` mode is planned for
 phase 2 we haven't considered a mitigation for this case.
 
+#### Container Images with High IDs
+
+There are container images designed to run with high user and group IDs. It's
+possible that the IDs range assigned to the pod is not big enough to accomodate
+these IDs, in this case they will be mapped to the `nobody` user in the host.
+
+It's not a big problem in the `Cluster` case, the users have to be sure that
+they provide a range accomodating these IDs. It's more difficult to handle in
+the `Pod` case as the logic to allocate the ranges for each pod has to take this
+information in consideration. It's likely that this requires some changes to the
+CRI and kubelet so the runtimes can inform the kubelet what are the IDs present
+on a specific container image.
+
 ## Implementation Phases
 
 The implemenation of this KEP in a single phase is complicated as there are many
