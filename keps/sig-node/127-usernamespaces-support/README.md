@@ -257,7 +257,7 @@ What is out of scope for this KEP? Listing non-goals helps to focus discussion
 and make progress.
 -->
 
-- Provide a way to run the Kubelet process or container runtimes as an
+- Provide a way to run the kubelet process or container runtimes as an
   unprivileged process. Although initiatives like
   [usernetes](https://github.com/rootless-containers/usernetes) and this KEP
   both make use of user namespaces, it is a different implementation for a
@@ -391,9 +391,9 @@ Docker only supports a [single ID
   mappings](https://github.com/moby/moby/issues/28593) yet. Dockershim runtime
   is only compatible with pods running in `Host` and `Cluster` modes. The user
   has to guarantee that the ID mappings configured in Docker through the
-  `userns-remap` parameter and the cluster-wide range configured in the Kubelet
+  `userns-remap` parameter and the cluster-wide range configured in the kubelet
   are the same. The dockershim implementation includes a check to verify that
-  the IDs mapping received from the Kubelet are equal to the ones configured in
+  the IDs mapping received from the kubelet are equal to the ones configured in
   Docker, returning an error otherwise.
 - **containerd**:
   It's quite straigtforward to implement the CRI changes proposed below in
