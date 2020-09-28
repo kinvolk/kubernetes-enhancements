@@ -282,7 +282,7 @@ different strategies:
   don't have access permissions for `others` because the effective user and
   group IDs on the host are the same for all the pods.
 - The semantics of semantics of `fsGroup` are respected, if it's specified it's
-  assumed to be the correct GID in the host and an 1-to-1 mapping entry for the
+  assumed to be the correct GID in the host and a 1-to-1 mapping entry for the
   `fsGroup` is added to the GID mappings for the pod.
 
 There are some cases that require special attention from the user. For instance,
