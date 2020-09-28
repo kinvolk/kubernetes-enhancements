@@ -495,7 +495,7 @@ type PodSpec struct {
 
 ### CRI API Changes
 
-The CRI has to be extended to allow kubelet to specify the user namespace mode
+The CRI is extended to (optionally) specify the user namespace mode
 and the ID mappings for a pod.
 [`NamespaceOption`](https://github.com/kubernetes/cri-api/blob/1eae59a7c4dee45a900f54ea2502edff7e57fd68/pkg/apis/runtime/v1alpha2/api.proto#L228)
 is extended with two new fields:
