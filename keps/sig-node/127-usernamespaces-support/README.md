@@ -150,7 +150,7 @@ Container security consists of many different kernel features that work together
 to make containers secure. User namespaces isolate user and group IDs by
 allowing processes to run with different IDs in the container and in the host.
 Specially, a process running as privileged in a container can be
-unprivileged in the host. This gives more capabilities to the containers and
+unprivileged in the host. This makes it possible to give more capabilities to the containers and
 protects the host from malicious or compromised containers.
 
 This KEP is a continuation of the work initiated in the [Support Node-Level User
