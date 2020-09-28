@@ -248,7 +248,7 @@ know that this has succeeded?
 - Make it possible to run workloads that need "dangerous" capabilities such as
   `CAP_SYS_ADMIN` without impacting the host.
 - Benefit from the security hardening that user namespaces are expected to
-  provide against some of the future unknown runtime vulnerabilities
+  provide against some of the future unknown runtime vulnerabilities.
 
 ### Non-Goals
 
@@ -503,7 +503,7 @@ on a specific container image.
 
 ## Implementation Phases
 
-The implemenation of this KEP in a single phase is complicated as there are many
+The implementation of this KEP in a single phase is complicated as there are many
 discussions to be done. We learned from previous attempts to bring this support in
 that it should be done in small steps to avoid losing the focus on the
 discussion. It's also true that a full plan should be agreed at the beginning to
@@ -543,8 +543,8 @@ phase(s) but are not needed for phase 1, hence they are not discussed in detail:
   It's not clear when and how this support will land in the Linux Kernel.
 - **ID Mappings Allocation Algorithm**
   The `Pod` mode requires to have each pod in different and non-overlapping ID mapping. It requires to implement an algorithm that performs that allocation. There are some open questions about it:
-    - What should be the length of the mapping assigned to each Pod?
-    - How to get the ID mapping range of a running Pod when kubelet crashes?
+    - What should be the length of the mapping assigned to each pod?
+    - How to get the ID mapping range of a running pod when kubelet crashes?
     - Can the user specify the ID mappings for a pod?
 - **High IDs in Container Images**:
   The IDs present on the image are not available as image metadata. The runtimes
@@ -576,7 +576,7 @@ This section only focuses on phase 1 as specified above.
 - Extend the CRI to have a user namespace mode and the user and group ID mappings.
 - Add a `userNamespaceMode` field to the pod spec.
 - Add the cluster-wide ID mappings to the kubelet configuration file.
-- Add a `UserNamespacesSupport` feature flag to enable / disable the user.
+- Add a `UserNamespacesSupport` feature flag to enable / disable the user
   namespaces support.
 - Update owner of ephemeral volumes populated by the kubelet.
 
@@ -769,7 +769,7 @@ The container runtime will have to be updated in the nodes to support this featu
 The new `user` field in the `NamespaceOption` will be ignored by an old runtime
 without user namespaces support. The container will be placed in the host user
 namespace. It's a responsibility of the user to guarantee that a runtime
-supporting user namespaces is used.
+supporting user namespaces is used when this feature is enabled.
 
 An old version of kubelet without user namespaces support can cause some
 issues too. In this case the runtime can wrongly infer that the `user` field
@@ -960,7 +960,6 @@ mechanism to default to the host user namespace when the pod specification inclu
 features that could be not compatible with user namespaces (similar to [Default host user
 namespace via experimental
 flag](https://github.com/kubernetes/kubernetes/pull/31169)).
-
 This proposal doesn't require a similar mechanishm given that the default mode
 is `Host` that works with all current existing workloads.
 
