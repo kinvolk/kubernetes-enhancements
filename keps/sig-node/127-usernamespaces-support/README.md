@@ -271,7 +271,7 @@ In regard to this proposal, volumes can be divided in ephemeral and non-ephemera
 Ephemeral volumes are associated to a **single** pod and their lifecyle is
 dependent on that pod. These are `configMap`, `secret`, `emptyDir`,
 `downwardAPI`, etc. These kind of volumes are easy to handle as they are not
-shared by different pods and hence all the process accessig those volumes have
+shared by different pods and hence all the processes accessing those volumes have
 the same effective user and group IDs. Kubelet creates the files for those
 volumes and it can easily set the file ownership too.
 
