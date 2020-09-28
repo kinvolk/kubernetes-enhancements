@@ -345,7 +345,7 @@ they are working on a solution for it.
 
 Another risk is exausting the disk space on the nodes if pods are repeativily
 started and stopped while using `Pod` mode. Since `Pod` mode is planned for
-phase 2 we haven't consider a mitigation for this case.
+phase 2 we haven't considered a mitigation for this case.
 
 ## Implementation Phases
 
