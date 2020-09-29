@@ -876,9 +876,9 @@ the existing API objects?** Yes. The PodSpec will be increased. TODO(Mauricio): 
 
 * **Will enabling / using this feature result in increasing time taken by any
 operations covered by [existing SLIs/SLOs]?**
-  Yes. The runtime has to set correct ownership for the container image
-  before starting it.
-  TODO(Mauricio): check what are those SLIs/SLOs and if this case actually applies.
+  Yes. The startup latency of both stateless and stateful pods is increased as
+  the rhe runtime has to set correct ownership for the container image before
+  starting them.
 
 * **Will enabling / using this feature result in non-negligible increase of
 resource usage (CPU, RAM, disk, IO, ...) in any components?**: No.
