@@ -197,7 +197,8 @@ different modes: `Host` keeps the current behaviour, `Cluster` uses the same
 ID mapping for all the pods (very similar to the previous [Support Node-Level User
 Namespaces
 Remapping](https://github.com/kubernetes/community/blob/master/contributors/design-proposals/node/node-usernamespace-remapping.md)
-proposal) and `Pod` increases pod-to-pod isolation.
+proposal) and `Pod` increases pod-to-pod isolation by giving each pod a
+different and non-overlapping ID mapping.
 
 ## Motivation
 
