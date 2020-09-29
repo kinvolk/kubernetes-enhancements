@@ -249,7 +249,7 @@ know that this has succeeded?
 - Make it possible to run workloads that need highly privileged capabilities such as
   `CAP_SYS_ADMIN` without impacting the host.
 - Benefit from the security hardening that user namespaces are expected to
-  provide against some of the future unknown runtime vulnerabilities.
+  provide against some of the future unknown runtime and kernel vulnerabilities.
 
 ### Non-Goals
 
