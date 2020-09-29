@@ -318,7 +318,7 @@ bogged down.
 As a cluster admin, I want run some pods with privileged capabilities because
 the applications in the pods require it (e.g. `CAP_SYS_ADMIN` to mount a FUSE
 filesystem or `CAP_NET_ADMIN` to setup a VPN) but I don't want this extra
-capability to give any extra privilege on the host.
+capability to grant me any extra privilege on the host.
 
 #### Story 2
 
