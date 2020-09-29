@@ -381,7 +381,7 @@ owned by a user different than the effective user of that process in a volume
 that doesn't support the semantics of `fsGroup` (doesn't support
 [`SetVolumeOwnership`](https://github.com/kubernetes/kubernetes/blob/00da04ba23d755d02a78d5021996489ace96aa4d/pkg/volume/volume_linux.go#L42)
 that updates permissions and ownership of the files to be accesible by the
-`fsGroup` group ID). These pods should be run in `Host` mode.
+`fsGroup` group ID). Such pods should be run in `Host` mode.
 
 #### Container Runtime Support
 
