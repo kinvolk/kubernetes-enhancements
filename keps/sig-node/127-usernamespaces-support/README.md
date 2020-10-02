@@ -581,28 +581,6 @@ This section only focuses on phase 1 as specified above.
   namespaces support.
 - Update owner of ephemeral volumes populated by the kubelet.
 
-### PodSpec Changes
-
-`v1.PodSpec` is extended with a new `UserNamesapceMode` field:
-
-```
-const (
-	UserNamespaceModeHost    PodUserNamespaceMode = "Host"
-	UserNamespaceModeCluster PodUserNamespaceMode = "Cluster"
-)
-
-type PodSpec struct {
-...
-  // UserNamespaceMode controls how user namespaces are used for this Pod.
-  // Three modes are supported:
-  // "Host": The pod shares the host user namespace. (default value).
-  // "Cluster": The pod uses a cluster-wide configured ID mappings.
-  // +k8s:conversion-gen=false
-  // +optional
-  UserNamespaceMode PodUserNamespaceMode `json:"userNamespaceMode,omitempty" protobuf:"bytes,36,opt  name=userNamespaceMode"`
-...
-```
-
 ### CRI API Changes
 
 The CRI is extended to (optionally) specify the user namespace mode
@@ -643,6 +621,28 @@ message NamespaceOption {
     // ID mappings to use when the user namespace mode is POD.
     LinuxUserNamespaceConfig mappings = 6;
 }
+```
+
+### PodSpec Changes
+
+`v1.PodSpec` is extended with a new `UserNamesapceMode` field:
+
+```
+const (
+	UserNamespaceModeHost    PodUserNamespaceMode = "Host"
+	UserNamespaceModeCluster PodUserNamespaceMode = "Cluster"
+)
+
+type PodSpec struct {
+...
+  // UserNamespaceMode controls how user namespaces are used for this Pod.
+  // Three modes are supported:
+  // "Host": The pod shares the host user namespace. (default value).
+  // "Cluster": The pod uses a cluster-wide configured ID mappings.
+  // +k8s:conversion-gen=false
+  // +optional
+  UserNamespaceMode PodUserNamespaceMode `json:"userNamespaceMode,omitempty" protobuf:"bytes,36,opt  name=userNamespaceMode"`
+...
 ```
 
 ### Test Plan
