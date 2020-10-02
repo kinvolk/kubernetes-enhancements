@@ -479,17 +479,17 @@ The current implementation in container runtimes is to recursively perform a
 as it potentially increases the time and the storage needed to handle the
 container images.
 
-There is not immediate mitigation for it, [we
+Some runtimes, like cri-o, mitigate these problems by using the `metacopy`
+option of overlayfs. This option avoids copying the whole file content when an
+operation updating only the metadata, like `chown` or `chmod`, is performed.
+This solution could be adopted by other runtimes until a more sophisticated
+approach is implemented in the kernel. [We
 talked](https://lists.linuxfoundation.org/pipermail/containers/2020-September/042230.html)
 to the Linux kernel community and [they
 replied](https://lists.linuxfoundation.org/pipermail/containers/2020-September/042230.html)
 they are working on a solution for it. If the Linux kernel provides a solution
 for this problem, that would be something that container runtimes should use. It
 does not impact the kubelet nor the CRI gRPC spec.
-
-Another risk is exausting the disk space on the nodes if pods are repeativily
-started and stopped while using `Pod` mode. Since `Pod` mode is planned for
-phase 2 we haven't considered a mitigation for this case.
 
 #### Container Images with High IDs
 
@@ -542,8 +542,12 @@ phase(s) but are not needed for phase 1, hence they are not discussed in detail:
   workloads not compatible with user namespaces. A [host defaulting
   mechanishm](#host-defaulting-mechanishm) can help to make this transition
   smoother.
-- **Duplicated Snapshots of Container Images**:
-  It's not clear when and how this support will land in the Linux Kernel.
+- **Container Image Garbage Collection**:
+  It has to be studied in detail how the garbage collection has to work when
+  there are different snapshots of the same container image for different ID
+  mappings. It's likely that a container image will be used only once with the
+  same ID mappings when using the `Pod` mode, in this case the image snapshot
+  can be removed just after the container is killed.
 - **ID Mappings Allocation Algorithm**
   The `Pod` mode requires to have each pod in different and non-overlapping ID mapping. It requires to implement an algorithm that performs that allocation. There are some open questions about it:
     - What should be the length of the mapping assigned to each pod?
