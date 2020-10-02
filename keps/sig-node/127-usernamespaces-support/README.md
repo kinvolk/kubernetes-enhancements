@@ -677,11 +677,18 @@ type PodSecurityContext struct {
 
 ### Configuring the Cluster ID Mappings
 
+This proposal considers two different ways to configure the ID mappings used for the `Cluster` mode.
+This is for discussion with the community and only one will be considered.
+
+#### Option 1: Configure in Kubelet Configuration File
+
 The ID mappings used for pods in `Cluster` mode are set in the kubelet
 configuration file. The file allows to set different ID mappings for user and
 group. Kubelet performs a check looking for configuration mistakes, like
 overlapping mappings, to prevent kubelet sending wrong ID mappings to the
 runtime.
+
+The following is an example a configuration file:
 
 ```
 apiVersion: kubelet.config.k8s.io/v1beta1
@@ -698,8 +705,27 @@ userNamespaceClusterMapping:
   - containerID: 0
     hostID: 200000
     size: 1000
-
 ```
+
+**Pros**:
+ - It's directly accessible by the kubelet. It's not needed to expose through an
+   API and there are not concerns if the api server is down.
+ - No modifications are needed to other components.
+
+**Cons**:
+ - It's more difficult for the user as they have to guarantee the same ID
+   mapping is configured in all the nodes.
+
+#### Option 2: Configure as a Cluster Parameter in kube-apiserver
+
+This option considers setting this parameter on the kube-apiserver.
+
+**Pros**:
+ - Easier for the user as the parameter is configured once in a single place.
+
+ **Cons**:
+ - It's difficult to expose this parameter to the kubelet.
+ - The parameter could not be available for the kubelet if the kube-apiserver is down.
 
 ### Updating Ownership of Ephemeral Volumes
 
