@@ -625,7 +625,7 @@ message NamespaceOption {
 
 ### PodSpec Changes
 
-`v1.PodSpec` is extended with a new `UserNamesapceMode` field:
+`v1.PodSpec` is extended with a new `UserNamespaceMode` field:
 
 ```
 const (
@@ -643,6 +643,32 @@ type PodSpec struct {
   // +optional
   UserNamespaceMode PodUserNamespaceMode `json:"userNamespaceMode,omitempty" protobuf:"bytes,36,opt  name=userNamespaceMode"`
 ...
+```
+
+### Configuring the Cluster ID Mappings
+
+The ID mappings used for pods in `Cluster` mode are set in the kubelet
+configuration file. The file allows to set different ID mappings for user and
+group. Kubelet performs a check looking for configuration mistakes, like
+overlapping mappings, to prevent kubelet sending wrong ID mappings to the
+runtime.
+
+```
+apiVersion: kubelet.config.k8s.io/v1beta1
+kind: KubeletConfiguration
+userNamespaceClusterMapping:
+  user:
+  - containerID: 0
+    hostID: 100000
+    size: 1000
+  - containerID: 1000
+    hotsID: 300000
+    size: 500
+  group:
+  - containerID: 0
+    hostID: 200000
+    size: 1000
+
 ```
 
 ### Updating Ownership of Ephemeral Volumes
