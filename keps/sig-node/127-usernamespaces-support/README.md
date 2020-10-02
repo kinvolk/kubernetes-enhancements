@@ -625,9 +625,15 @@ message NamespaceOption {
 }
 ```
 
-### PodSpec Changes
+### Add userNamespaceMode Field
 
-`v1.PodSpec` is extended with a new `UserNamespaceMode` field:
+The `userNamespaceMode` field can be added in two different places. This
+proposal presents the two possibilities to discuss with the community.
+
+#### Option 1: PodSpec
+
+Add it to `v1.PodSpec` following the rationale that other fields (`host{Network,
+IPC, PID}` that control namespaces behaviour are defined in this place.
 
 ```
 const (
@@ -644,6 +650,28 @@ type PodSpec struct {
   // +k8s:conversion-gen=false
   // +optional
   UserNamespaceMode PodUserNamespaceMode `json:"userNamespaceMode,omitempty" protobuf:"bytes,36,opt  name=userNamespaceMode"`
+...
+```
+
+#### Option 2: PodSecurityContext
+
+Add it to `v1.PodSpec.PodSecurityContext` as this field controls a security
+aspect of the pod.
+
+```
+const (
+	UserNamespaceModeHost    PodUserNamespaceMode = "Host"
+	UserNamespaceModeCluster PodUserNamespaceMode = "Cluster"
+)
+
+type PodSecurityContext struct {
+...
+  // UserNamespaceMode controls how user namespaces are used for this Pod.
+  // Three modes are supported:
+  // "Host": The pod shares the host user namespace. (default value).
+  // "Cluster": The pod uses a cluster-wide configured ID mappings.
+  // +optional
+  UserNamespaceMode PodUserNamespaceMode `json:"userNamespaceMode,omitempty" protobuf:"bytes,11,opt  name=userNamespaceMode"`
 ...
 ```
 
