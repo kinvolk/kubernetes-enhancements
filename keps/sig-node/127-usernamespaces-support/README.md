@@ -538,7 +538,7 @@ phase(s) but are not needed for phase 1, hence they are not discussed in detail:
   It's not clear yet what should be the process to make this happen as this is a
   potentially non backwards compatible change. It's specially relevant for
   workloads not compatible with user namespaces. A [host defaulting
-  mechanishm](#host-defaulting-mechanishm) can help to make this transiction
+  mechanishm](#host-defaulting-mechanishm) can help to make this transition
   smoother.
 - **Duplicated Snapshots of Container Images**:
   It's not clear when and how this support will land in the Linux Kernel.
@@ -558,7 +558,7 @@ phase(s) but are not needed for phase 1, hence they are not discussed in detail:
 - **Security Considerations**:
   Once `Pod` is the default mode, it is needed to control who can use `Host` and
   `Cluster` modes. This can be done through Pod Security Policies if they are
-  available at that time.
+  available at thet time of implementing this phase.
 
 ## Design Details
 
@@ -589,7 +589,6 @@ This section only focuses on phase 1 as specified above.
 const (
 	UserNamespaceModeHost    PodUserNamespaceMode = "Host"
 	UserNamespaceModeCluster PodUserNamespaceMode = "Cluster"
-	UserNamespaceModePod     PodUserNamespaceMode = "Pod"
 )
 
 type PodSpec struct {
@@ -598,7 +597,6 @@ type PodSpec struct {
   // Three modes are supported:
   // "Host": The pod shares the host user namespace. (default value).
   // "Cluster": The pod uses a cluster-wide configured ID mappings.
-  // "Pod": The pod gets a non-overlapping ID mappings range.
   // +k8s:conversion-gen=false
   // +optional
   UserNamespaceMode PodUserNamespaceMode `json:"userNamespaceMode,omitempty" protobuf:"bytes,36,opt  name=userNamespaceMode"`
@@ -949,8 +947,8 @@ proposal there are some big differences:
 This proposal intends to have `Host` instead of `Pod` as default value for the
 user namespace mode. The rationale behind this decision is that it avoids
 breaking existing workloads that don't work with user namespaces. We are aware
-that this decision has the drawback that pods that have the `userNamespaceMode`
-set will not have the security advantages of user namespaces but we consider
+that this decision has the drawback that pods that don't set the `userNamespaceMode`
+will not have the security advantages of user namespaces, however we consider
 it's more important to keep compatibility with previous workloads.
 
 ### Host Defaulting Mechanishm
@@ -962,7 +960,7 @@ features that could be not compatible with user namespaces (similar to [Default 
 namespace via experimental
 flag](https://github.com/kubernetes/kubernetes/pull/31169)).
 This proposal doesn't require a similar mechanishm given that the default mode
-is `Host` that works with all current existing workloads.
+is `Host`.
 
 ## References
 
