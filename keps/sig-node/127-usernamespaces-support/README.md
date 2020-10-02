@@ -645,6 +645,15 @@ type PodSpec struct {
 ...
 ```
 
+### Updating Ownership of Ephemeral Volumes
+
+Ephemeral volumes use
+[`AtomicWriter`](https://github.com/kinvolk/kubernetes/blob/master/pkg/volume/util/atomic_writer.go)
+to create the files that are mounted to the containers. This component [has some
+logic](https://github.com/kinvolk/kubernetes/blob/c94242a7b1d238cc27aea9b6d45ccb9963e814bb/pkg/volume/util/atomic_writer.go#L403)
+to update the ownership of those files in some cases. It can be extended to take
+the ID mappings into consideration when the pod runs in `Cluster` mode.
+
 ### Test Plan
 
 <!--
