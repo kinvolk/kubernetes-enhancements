@@ -285,7 +285,7 @@ specification with a new `userNamespaceMode` field. This field can have 3 values
 
 - **Host**:
   The pods are placed in the host user namespace, this is the current Kubernetes
-  behaviour. This mode is intended for pods that only work in the root (host)
+  behaviour. This mode is intended for pods that only work in the initial (host)
   user namespace. It is the default mode when `userNamespaceMode` field is not
   set.
 
@@ -432,7 +432,7 @@ Some features that don't work when the host user namespace is not shared are:
 - **Some Capabilities**:
   The Linux kernel takes into consideration the user namespace a process is
   running in while performing the capabilities check. There are some
-  capabilities that are only available in the root (host) user namespace such as
+  capabilities that are only available in the initial (host) user namespace such as
   `CAP_SYS_TIME`, `CAP_SYS_MODULE` & `CAP_MKNOD`.
 
   If a pod is given one of those capabilities it will still be deployed, but the
