@@ -997,13 +997,6 @@ Major milestones might include:
 Why should this KEP _not_ be implemented?
 -->
 
-TBD:
-Some ideas
-- another configuration knob is added
-- user namespaces could make troubleshooting difficult
-- volumes are really trickly to handle
-- any performance issues?
-
 ## Alternatives
 
 <!--
