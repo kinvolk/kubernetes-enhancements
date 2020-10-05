@@ -703,7 +703,7 @@ userNamespaceClusterMapping:
     hostID: 100000
     size: 1000
   - containerID: 1000
-    hotsID: 300000
+    hostID: 300000
     size: 500
   group:
   - containerID: 0
