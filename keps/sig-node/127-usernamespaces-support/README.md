@@ -388,16 +388,13 @@ that updates permissions and ownership of the files to be accesible by the
 #### Container Runtime Support
 
 - **Docker**:
-Docker only supports a [single ID
+  Docker only supports a [single ID
   mappings](https://docs.docker.com/engine/security/userns-remap/) shared by all
   containers running in the host. There is not support for [multiple ID
-  mappings](https://github.com/moby/moby/issues/28593) yet. Dockershim runtime
-  is only compatible with pods running in `Host` and `Cluster` modes. The user
-  has to guarantee that the ID mappings configured in Docker through the
-  `userns-remap` parameter and the cluster-wide range configured in the kubelet
-  are the same. The dockershim implementation includes a check to verify that
-  the IDs mapping received from the kubelet are equal to the ones configured in
-  Docker, returning an error otherwise.
+  mappings](https://github.com/moby/moby/issues/28593) yet. Updating dockershim
+  is out of scope of this KEP as [it's going to be
+  deprecated]((https://github.com/kubernetes/enhancements/pull/1985/)) and it
+  offers a very limited support for user namespaces.
 - **containerd**:
   It's quite straigtforward to implement the CRI changes proposed below in
   containerd/cri, we did it in
