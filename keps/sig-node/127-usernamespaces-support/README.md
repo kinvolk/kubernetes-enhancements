@@ -229,7 +229,7 @@ Specifically, a privileged process in the pod runs as an unprivileged process in
 host. If such a process is able to break out of the container to the host, it'll have limited
 impact as it'll be running as an unprivileged user there.
 
-The following security vulnerabilities are mitigated with
+The following security vulnerabilities were mitigated with
 user namespaces and it is expected that using them would mitigate against some of the future vulnerabilities.
 - CVE-2016-8867: Privilege escalation inside containers
   - https://github.com/moby/moby/issues/27590
@@ -250,7 +250,7 @@ know that this has succeeded?
   inside the container to unprivileged user and group IDs in the node.
 - Make it safer to run workloads that need highly privileged capabilities such as
   `CAP_SYS_ADMIN`, reducing the risk of impacting the host.
-- Benefit from the security hardening that user namespaces are expected to
+- Benefit from the security hardening that user namespaces
   provide against some of the future unknown runtime and kernel vulnerabilities.
 
 ### Non-Goals
@@ -265,7 +265,7 @@ and make progress.
   [usernetes](https://github.com/rootless-containers/usernetes) and this KEP
   both make use of user namespaces, it is a different implementation for a
   different purpose.
-- Supporting a shiftfs or similar solution once it's available in the kernel.
+- Supporting shiftfs or a similar solution once it's available in the kernel.
   Although the authors of this KEP would like to support this feature once it's
   available, this is out of scope of this KEP. The complexity of this would
   probably require to write a separate KEP.
@@ -324,7 +324,7 @@ capability to grant me any extra privilege on the host.
 
 #### Story 2
 
-As a cluster admin, I want to allow some pods to share the host user namespace
+As a cluster admin, I want to allow some pods to run in the host user namespace
 if they need a feature only available in such user namespace, such as loading a kernel module with `CAP_SYS_MODULE`.
 
 ### Notes/Constraints/Caveats
@@ -344,7 +344,7 @@ a different value on the host, this causes issues accessing volumes if the
 pod is run with a different mapping, i.e. the effective user and group IDs on
 the host change.
 
-This proposal supports volume without changing the user and group IDs and leaves
+This proposal supports volumes without changing the user and group IDs and leaves
 that problem to the user to manage. Future Linux kernel features such as shiftfs
 could allow different pods to see a volume with its own IDs but it is out of
 scope of this proposal. Among the possible future kernel solutions, we can list:
