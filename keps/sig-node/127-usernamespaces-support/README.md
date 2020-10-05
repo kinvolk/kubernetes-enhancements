@@ -819,15 +819,7 @@ in back-to-back releases.
 [conformance tests]: https://git.k8s.io/community/contributors/devel/sig-architecture/conformance-tests.md
 -->
 
-TBD
-Mauricio: Should we require Pod mode to be implemented to switch to Beta?
-
-#### Alpha -> Beta
-
-- Future Complete:
-  - `Pod` mode implemented
-
-#### Beta -> GA
+Will be added when targeting a release.
 
 ### Upgrade / Downgrade Strategy
 
@@ -965,7 +957,7 @@ of this feature?**
 provider?** No.
 
 * **Will enabling / using this feature result in increasing size or count of
-the existing API objects?** Yes. The PodSpec will be increased. TODO(Mauricio): what is the increased size?
+the existing API objects?** Yes. The PodSpec will be increased.
 
 * **Will enabling / using this feature result in increasing time taken by any
 operations covered by [existing SLIs/SLOs]?**
