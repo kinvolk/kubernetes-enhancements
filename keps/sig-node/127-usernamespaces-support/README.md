@@ -366,7 +366,7 @@ the file ownership too.
 Non-ephemeral volumes are more difficult to support since they can be persistent
 and shared by multiple pods. This proposal supports volumes with two different
 strategies:
-- The `Cluster` makes it easier for pods to share files using volumes when those
+- The `Cluster` mode makes it easier for pods to share files using volumes when those
   don't have access permissions for `others` because the effective user and
   group IDs on the host are the same for all the pods.
 - The semantics of semantics of `fsGroup` are respected, if it's specified it's
@@ -406,7 +406,7 @@ Docker only supports a [single ID
 - **cri-o**:
 CRI-O recently [added](https://github.com/cri-o/cri-o/pull/3944) support for
   user namespaces through a pod annotation. The extensions to make it work with
-  the current CRI changes are small.
+  the CRI changes proposed here are small.
 - TODO(Mauricio): gVisor, katacontainers?
 
 containerd and cri-o will provide support for the 3 possible values of `userNamespaceMode`.
@@ -637,7 +637,7 @@ proposal presents the two possibilities to discuss with the community.
 #### Option 1: PodSpec
 
 Add it to `v1.PodSpec` following the rationale that other fields (`host{Network,
-IPC, PID}` that control namespaces behaviour are defined in this place.
+IPC, PID}`) that control namespaces behaviour are defined in this place.
 
 ```
 const (
