@@ -539,12 +539,14 @@ phase(s) but are not needed for phase 1, hence they are not discussed in detail:
   workloads not compatible with user namespaces. A [host defaulting
   mechanishm](#host-defaulting-mechanishm) can help to make this transition
   smoother.
-- **Container Image Garbage Collection**:
-  It has to be studied in detail how the garbage collection has to work when
-  there are different snapshots of the same container image for different ID
-  mappings. It's likely that a container image will be used only once with the
-  same ID mappings when using the `Pod` mode, in this case the image snapshot
-  can be removed just after the container is killed.
+- **Duplicated Container Images Snapshots and Garbage Collection**:
+  The `Pod` mode makes it more difficult to handle the [duplicated
+  snapshots](#duplicated-snapshots-of-container-images) issue as it's possible
+  that a pod uses a unique ID mapping each time it's scheduled. The different
+  runtimes will have to use solutions like `metacopy` option of overlayfs or new
+  kernel features to overcome it. It's also likely that the garbage collection
+  algorithm has to be changed as image snapshots shold be deleted as soon as the
+  container finihes.
 - **ID Mappings Allocation Algorithm**
   The `Pod` mode requires to have each pod in different and non-overlapping ID mapping. It requires to implement an algorithm that performs that allocation. There are some open questions about it:
     - What should be the length of the mapping assigned to each pod?
