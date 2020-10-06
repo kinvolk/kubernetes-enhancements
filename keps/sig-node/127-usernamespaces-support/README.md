@@ -640,6 +640,8 @@ message NamespaceOption {
 The `userNamespaceMode` field can be added in two different places. This
 proposal presents the two possibilities to discuss with the community.
 
+<<[UNRESOLVED where to put the userNamespaceMode field ]>>
+
 #### Option 1: PodSpec
 
 Add it to `v1.PodSpec` following the rationale that other fields (`host{Network,
@@ -684,11 +686,14 @@ type PodSecurityContext struct {
   UserNamespaceMode PodUserNamespaceMode `json:"userNamespaceMode,omitempty" protobuf:"bytes,11,opt  name=userNamespaceMode"`
 ...
 ```
+<<[/UNRESOLVED]>>
 
 ### Configuring the Cluster ID Mappings
 
 This proposal considers two different ways to configure the ID mappings used for the `Cluster` mode.
 This is for discussion with the community and only one will be considered.
+
+<<[UNRESOLVED where to configure the cluster wide ID mappings ]>>
 
 #### Option 1: Configure in Kubelet Configuration File
 
@@ -738,6 +743,7 @@ This option considers setting this parameter on the kube-apiserver.
  - It's difficult to expose this parameter to the kubelet.
  - The parameter could not be available for the kubelet if the kube-apiserver is down.
 
+<<[/UNRESOLVED]>>
 
 ### 1-to-1 Mapping for fsGroup
 
