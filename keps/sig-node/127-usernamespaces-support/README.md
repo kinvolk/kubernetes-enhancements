@@ -697,18 +697,19 @@ The following is an example a configuration file:
 ```
 apiVersion: kubelet.config.k8s.io/v1beta1
 kind: KubeletConfiguration
-userNamespaceClusterMapping:
-  user:
+clusterIDMappings:
+  uidMappings:
   - containerID: 0
-    hostID: 100000
-    size: 1000
-  - containerID: 1000
-    hostID: 300000
-    size: 500
-  group:
+    hostID: 500000
+    size: 65536
+  - containerID: 100000
+    hostID: 600000
+    size: 65536
+  gidMappings:
   - containerID: 0
-    hostID: 200000
-    size: 1000
+    hostID: 500000
+    size: 65536
+
 ```
 
 **Pros**:
