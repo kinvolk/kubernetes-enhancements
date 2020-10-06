@@ -584,6 +584,7 @@ This section only focuses on phase 1 as specified above.
 - Add the cluster-wide ID mappings to the kubelet configuration file.
 - Add a `UserNamespacesSupport` feature flag to enable / disable the user
   namespaces support.
+- Include 1-to-1 mapping for fsGroup.
 - Update owner of ephemeral volumes populated by the kubelet.
 
 ### CRI API Changes
@@ -729,6 +730,39 @@ This option considers setting this parameter on the kube-apiserver.
  **Cons**:
  - It's difficult to expose this parameter to the kubelet.
  - The parameter could not be available for the kubelet if the kube-apiserver is down.
+
+
+### 1-to-1 Mapping for fsGroup
+
+The `fsGroup` is asssumed to be the correct group owner of the files present on
+the volumes. A 1-to-1 ID mapping is added to ensure that the same GID used in
+the container is the effective GID in the host when the fsGroup is defined. If
+the `fsGroup` is part of the cluster ID mappings, a hole is "punched", otherwise
+an extra one element ID mapping is added.
+
+For instance, if the cluster GID mappings are
+
+```
+ContainerID HostID Size
+0           1000   0
+```
+and there is a pod with `fsGroup: 500`, the GID mappings for that specific pod
+are
+
+```
+ContainerID HostID Size
+0           1000   500
+501         1501   499
+500         500    1
+```
+
+On the other hand, if a pod has `fsGroup: 3000`, the GID mappings for that pod are
+
+```
+ContainerID HostID Size
+0           1000   1000
+3000        3000   1
+```
 
 ### Updating Ownership of Ephemeral Volumes
 
