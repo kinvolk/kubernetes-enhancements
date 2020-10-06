@@ -404,7 +404,7 @@ that updates permissions and ownership of the files to be accesible by the
 CRI-O recently [added](https://github.com/cri-o/cri-o/pull/3944) support for
   user namespaces through a pod annotation. The extensions to make it work with
   the CRI changes proposed here are small.
-- TODO(Mauricio): gVisor, katacontainers?
+- gVisor, katacontainers: It's still to investigate.
 
 containerd and cri-o will provide support for the 3 possible values of `userNamespaceMode`.
 
