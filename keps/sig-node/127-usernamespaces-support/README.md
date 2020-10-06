@@ -376,9 +376,9 @@ strategies:
 This KEP doesn't impose any restriction on the different volumes and
 `userNamespaceMode` combinations and leaves it to users to chose the correct
 combinations based on their specific needs.
-
-There are some cases that require special attention from the user. For instance,
-a process inside a pod will not be able to access files with mode `0700` and
+For instance, if a pod access a shared volume containing files and folders with
+permissions for `others`, it can run in `Pod` mode. On the other hand, a process
+inside a pod will not be able to access files with mode `0700` and
 owned by a user different than the effective user of that process in a volume
 that doesn't support the semantics of `fsGroup` (doesn't support
 [`SetVolumeOwnership`](https://github.com/kubernetes/kubernetes/blob/00da04ba23d755d02a78d5021996489ace96aa4d/pkg/volume/volume_linux.go#L42)
