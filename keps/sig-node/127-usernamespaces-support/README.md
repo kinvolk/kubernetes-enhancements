@@ -599,18 +599,18 @@ is extended with two new fields:
 - The ID mappings to be used if the user namespace mode is `POD`.
 
 ```
-// LinuxIDMapping represents a single user namespace mapping in Linux.
+// LinuxIDMapping represents a single user namespace ID mapping.
 message LinuxIDMapping {
    // container_id is the starting ID for the mapping inside the container.
    uint32 container_id = 1;
    // host_id is the starting ID for the mapping on the host.
    uint32 host_id = 2;
-   // number of IDs in this mapping.
-   uint32 length = 3;
+   // size is the number of elements in the mapping.
+   uint32 size = 3;
 }
 
-// LinuxUserNamespaceConfig represents the user and group ID mapping in Linux.
-message LinuxUserNamespaceConfig {
+// LinuxIDMappings represents the user and group user namespace ID mappings.
+message LinuxIDMappings {
    // uid_mappings is an array of user ID mappings.
    repeated LinuxIDMapping uid_mappings = 1;
    // gid_mappings is an array of group ID mappings.
@@ -624,8 +624,8 @@ message NamespaceOption {
     // Note: There is currently no way to set CONTAINER scoped user namespace in the Kubernetes API.
     // Namespaces currently set by the kubelet: POD, NODE
     Namespace user = 5;
-    // ID mappings to use when the user namespace mode is POD.
-    LinuxUserNamespaceConfig mappings = 6;
+    // IDs mappings to use if the user NamespaceMode is POD
+    LinuxIDMappings id_mappings = 6
 }
 ```
 
