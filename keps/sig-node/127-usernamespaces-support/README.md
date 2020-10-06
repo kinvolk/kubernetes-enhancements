@@ -853,7 +853,23 @@ in back-to-back releases.
 [conformance tests]: https://git.k8s.io/community/contributors/devel/sig-architecture/conformance-tests.md
 -->
 
-Will be added when targeting a release.
+#### Alpha
+
+- [ ] Support for `Cluster` and `Host` modes implemented.
+- [ ] Support implemented in CRI-O.
+- [ ] Support implemented in containerd.
+- [ ] Unit test coverage.
+- [ ] Support for `Pod` mode discused and implemented.
+
+#### Beta
+
+- [ ] Feedback from alpha is addressed.
+- [ ] E2E test coverage.
+- [ ] There are well-documented use cases of this feature.
+
+#### GA
+
+TDB
 
 ### Upgrade / Downgrade Strategy
 
