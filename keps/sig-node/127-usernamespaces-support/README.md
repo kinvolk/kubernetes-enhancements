@@ -309,7 +309,7 @@ specification with a new `userNamespaceMode` field. This field can have 3 values
   non-overlapping ID mapping. This mode is intended for stateless pods, i.e.
   pods using only ephemeral volumes like `configMap,` `downwardAPI`, `secret`,
   `projected` and `emptyDir`. This mode not only provides host-to-pod isolation
-  but also  pod-to-pod isolation as each pod has a different range of effective
+  but also pod-to-pod isolation as each pod has a different range of effective
   IDs in the host.
 
 ### User Stories
