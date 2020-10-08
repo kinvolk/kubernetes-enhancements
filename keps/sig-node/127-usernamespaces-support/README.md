@@ -192,8 +192,8 @@ updates.
 Container security consists of many different kernel features that work together
 to make containers secure. User namespaces isolate user and group IDs by
 allowing processes to run with different IDs in the container and in the host.
-Specially, a process running as privileged in a container can be
-unprivileged in the host. This makes it possible to give more capabilities to the containers and
+Specially, a process running as privileged in a container can be unprivileged in
+the host. This makes it possible to give more capabilities to the containers and
 protects the host and other containers from malicious or compromised containers.
 
 This KEP adds a new `userNamespaceMode` field  to `pod.Spec`. It allows users to
@@ -201,9 +201,9 @@ place pods in different user namespaces increasing the  pod-to-pod and
 pod-to-host isolation. This extra isolation increases the cluster security as it
 protects the host and other pods from malicious or compromised processes inside
 containers that are able to break into the host. This KEP proposes three
-different modes: `Host` uses the host user namespace like the current behaviour, `Cluster` uses a unique user namespace per pod but the same
-ID mapping for all the pods (very similar to the previous [Support Node-Level User
-Namespaces
+different modes: `Host` uses the host user namespace like the current behaviour,
+`Cluster` uses a unique user namespace per pod but the same ID mapping for all
+the pods (very similar to the previous [Support Node-Level User Namespaces
 Remapping](https://github.com/kubernetes/community/blob/master/contributors/design-proposals/node/node-usernamespace-remapping.md)
 proposal) and `Pod` increases pod-to-pod isolation by giving each pod a
 different and non-overlapping ID mapping.
@@ -219,24 +219,25 @@ demonstrate the interest in a KEP within the wider Kubernetes community.
 [experience reports]: https://github.com/golang/go/wiki/ExperienceReports
 -->
 
-From [user_namespaces(7)](https://man7.org/linux/man-pages/man7/user_namespaces.7.html):
+From
+[user_namespaces(7)](https://man7.org/linux/man-pages/man7/user_namespaces.7.html):
 > User namespaces isolate security-related identifiers and attributes, in
 particular, user IDs and group IDs, the root directory, keys, and capabilities.
 A process's user and group IDs can be different inside and outside a user
 namespace. In particular, a process can have a normal unprivileged user ID
-outside a user namespace while at the same time having a user ID of 0 inside
-the namespace; in other words, the process has full privileges for operations
-inside the user namespace, but is unprivileged for operations outside the
-namespace.
+outside a user namespace while at the same time having a user ID of 0 inside the
+namespace; in other words, the process has full privileges for operations inside
+the user namespace, but is unprivileged for operations outside the namespace.
 
 The goal of supporting user namespaces in Kubernetes is to be able to run
 processes in pods with a different user and group IDs than in the host.
-Specifically, a privileged process in the pod runs as an unprivileged process in the
-host. If such a process is able to break out of the container to the host, it'll have limited
-impact as it'll be running as an unprivileged user there.
+Specifically, a privileged process in the pod runs as an unprivileged process in
+the host. If such a process is able to break out of the container to the host,
+it'll have limited impact as it'll be running as an unprivileged user there.
 
-The following security vulnerabilities were mitigated with
-user namespaces and it is expected that using them would mitigate against some of the future vulnerabilities.
+The following security vulnerabilities were mitigated with user namespaces and
+it is expected that using them would mitigate against some of the future
+vulnerabilities.
 - CVE-2016-8867: Privilege escalation inside containers
   - https://github.com/moby/moby/issues/27590
 - CVE-2018-15664: TOCTOU race attack that allows to read/write files in the host
@@ -254,10 +255,10 @@ know that this has succeeded?
 - Increase node to pod isolation in Kubernetes by mapping user and group IDs
   inside the container to different IDs in the host. In particular, mapping root
   inside the container to unprivileged user and group IDs in the node.
-- Make it safer to run workloads that need highly privileged capabilities such as
-  `CAP_SYS_ADMIN`, reducing the risk of impacting the host.
-- Benefit from the security hardening that user namespaces
-  provide against some of the future unknown runtime and kernel vulnerabilities.
+- Make it safer to run workloads that need highly privileged capabilities such
+  as `CAP_SYS_ADMIN`, reducing the risk of impacting the host.
+- Benefit from the security hardening that user namespaces provide against some
+  of the future unknown runtime and kernel vulnerabilities.
 
 ### Non-Goals
 
@@ -287,7 +288,8 @@ nitty-gritty.
 -->
 
 This proposal aims to support user namespaces in Kubernetes by extending the pod
-specification with a new `userNamespaceMode` field. This field can have 3 values:
+specification with a new `userNamespaceMode` field. This field can have 3
+values:
 
 - **Host**:
   The pods are placed in the host user namespace, this is the current Kubernetes
@@ -331,7 +333,8 @@ capability to grant me any extra privilege on the host.
 #### Story 2
 
 As a cluster admin, I want to allow some pods to run in the host user namespace
-if they need a feature only available in such user namespace, such as loading a kernel module with `CAP_SYS_MODULE`.
+if they need a feature only available in such user namespace, such as loading a
+kernel module with `CAP_SYS_MODULE`.
 
 ### Notes/Constraints/Caveats
 
@@ -346,20 +349,22 @@ This might be a good place to talk about core concepts and how they relate.
 
 The Linux kernel uses the effective user and group IDs (the ones the host) to
 check the file access permissions. Since with user namespaces IDs are mapped to
-a different value on the host, this causes issues accessing volumes if the
-pod is run with a different mapping, i.e. the effective user and group IDs on
-the host change.
+a different value on the host, this causes issues accessing volumes if the pod
+is run with a different mapping, i.e. the effective user and group IDs on the
+host change.
 
-This proposal supports volumes without changing the user and group IDs and leaves
-that problem to the user to manage. Future Linux kernel features such as shiftfs
-could allow different pods to see a volume with its own IDs but it is out of
-scope of this proposal. Among the possible future kernel solutions, we can list:
+This proposal supports volumes without changing the user and group IDs and
+leaves that problem to the user to manage. Future Linux kernel features such as
+shiftfs could allow different pods to see a volume with its own IDs but it is
+out of scope of this proposal. Among the possible future kernel solutions, we
+can list:
 
 - [shiftfs: uid/gid shifting filesystem](https://lwn.net/Articles/757650/)
 - [A new API for mounting filesystems](https://lwn.net/Articles/753473/)
 - [user_namespace: introduce fsid mappings](https://lwn.net/Articles/812221/)
 
-In regard to this proposal, volumes can be divided in ephemeral and non-ephemeral.
+In regard to this proposal, volumes can be divided in ephemeral and
+non-ephemeral.
 
 Ephemeral volumes are associated to a **single** pod and their lifecyle is
 dependent on that pod. These are `configMap`, `secret`, `emptyDir`,
@@ -372,21 +377,21 @@ the file ownership too.
 Non-ephemeral volumes are more difficult to support since they can be persistent
 and shared by multiple pods. This proposal supports volumes with two different
 strategies:
-- The `Cluster` mode makes it easier for pods to share files using volumes when those
-  don't have access permissions for `others` because the effective user and
-  group IDs on the host are the same for all the pods.
+- The `Cluster` mode makes it easier for pods to share files using volumes when
+  those don't have access permissions for `others` because the effective user
+  and group IDs on the host are the same for all the pods.
 - The semantics of semantics of `fsGroup` are respected, if it's specified it's
   assumed to be the correct GID in the host and a 1-to-1 mapping entry for the
   `fsGroup` is added to the GID mappings for the pod.
 
 This KEP doesn't impose any restriction on the different volumes and
 `userNamespaceMode` combinations and leaves it to users to chose the correct
-combinations based on their specific needs.
-For instance, if a pod access a shared volume containing files and folders with
-permissions for `others`, it can run in `Pod` mode. On the other hand, a process
-inside a pod will not be able to access files with mode `0700` and
-owned by a user different than the effective user of that process in a volume
-that doesn't support the semantics of `fsGroup` (doesn't support
+combinations based on their specific needs. For instance, if a pod access a
+shared volume containing files and folders with permissions for `others`, it can
+run in `Pod` mode. On the other hand, a process inside a pod will not be able to
+access files with mode `0700` and owned by a user different than the effective
+user of that process in a volume that doesn't support the semantics of `fsGroup`
+(doesn't support
 [`SetVolumeOwnership`](https://github.com/kubernetes/kubernetes/blob/00da04ba23d755d02a78d5021996489ace96aa4d/pkg/volume/volume_linux.go#L42)
 that updates permissions and ownership of the files to be accesible by the
 `fsGroup` group ID). Such pods should be run in `Host` mode.
@@ -407,7 +412,7 @@ that updates permissions and ownership of the files to be accesible by the
   [this](https://github.com/kinvolk/containerd-cri/commits/mauricio/userns_poc)
   PoC.
 - **cri-o**:
-CRI-O recently [added](https://github.com/cri-o/cri-o/pull/3944) support for
+  CRI-O recently [added](https://github.com/cri-o/cri-o/pull/3944) support for
   user namespaces through a pod annotation. The extensions to make it work with
   the CRI changes proposed here are small.
 - gVisor, katacontainers: It's still to investigate.
@@ -435,8 +440,8 @@ Some features that don't work when the host user namespace is not shared are:
 - **Some Capabilities**:
   The Linux kernel takes into consideration the user namespace a process is
   running in while performing the capabilities check. There are some
-  capabilities that are only available in the initial (host) user namespace such as
-  `CAP_SYS_TIME`, `CAP_SYS_MODULE` & `CAP_MKNOD`.
+  capabilities that are only available in the initial (host) user namespace such
+  as `CAP_SYS_TIME`, `CAP_SYS_MODULE` & `CAP_MKNOD`.
 
   If a pod is given one of those capabilities it will still be deployed, but the
   capability will be ineffective and processes using those capabilities will
@@ -456,8 +461,8 @@ Some features that don't work when the host user namespace is not shared are:
   - Mounting `mqueue` (`/dev/mqueue`) is not allowed from a process in a user
     namespace that does not own the IPC namespace. Pods with `hostIPC=true` and
     `userNamespaceMode=Pod|Cluster` can fail.
-  - Mounting `procfs` (`/proc`) is not allowed from a process in a user namespace
-    that does not own the PID namespace. Pods with `hostPID=true` and
+  - Mounting `procfs` (`/proc`) is not allowed from a process in a user
+    namespace that does not own the PID namespace. Pods with `hostPID=true` and
     `userNamespaceMode=Pod|Cluster` can fail.
   - Mounting `sysfs` (`/sys`) is not allowed from a process in a user namespace
     that does not own the network namespace. Impact: pods with
@@ -465,11 +470,12 @@ Some features that don't work when the host user namespace is not shared are:
 
   If users specify `userNamespaceMode=Pod|Cluster` and one of these
   `host{IPC,PID,Network}=true` options, runc will currently fail to start the
-  container. The kubelet does **not** try to prevent that combination of options,
-  in case runc or the kernel make it possible in the future to use that
+  container. The kubelet does **not** try to prevent that combination of
+  options, in case runc or the kernel make it possible in the future to use that
   combination.
 
-In order to avoid breaking existing workloads `Host` is the default value of `userNamespaceMode`.
+In order to avoid breaking existing workloads `Host` is the default value of
+`userNamespaceMode`.
 
 #### Duplicated Snapshots of Container Images
 
@@ -509,11 +515,11 @@ on a specific container image.
 
 ## Implementation Phases
 
-The implementation of this KEP in a single phase is complicated as there are many
-discussions to be done. We learned from previous attempts to bring this support in
-that it should be done in small steps to avoid losing the focus on the
-discussion. It's also true that a full plan should be agreed at the beginning to
-avoid changing the implementation drastically in further phases.
+The implementation of this KEP in a single phase is complicated as there are
+many discussions to be done. We learned from previous attempts to bring this
+support in that it should be done in small steps to avoid losing the focus on
+the discussion. It's also true that a full plan should be agreed at the
+beginning to avoid changing the implementation drastically in further phases.
 
 This proposal implementation aims to be divided in the following phases:
 
@@ -532,8 +538,8 @@ this feature.
 
 ### Future Phases
 
-These phases aim to implement the `Pod` mode. After these phases are completed the
-full advantanges of user namespaces can be used in some cases (stateless
+These phases aim to implement the `Pod` mode. After these phases are completed
+the full advantanges of user namespaces can be used in some cases (stateless
 workloads).
 
 There are some things that have to be studied with more detail for these
@@ -554,7 +560,9 @@ phase(s) but are not needed for phase 1, hence they are not discussed in detail:
   algorithm has to be changed as image snapshots shold be deleted as soon as the
   container finihes.
 - **ID Mappings Allocation Algorithm**
-  The `Pod` mode requires to have each pod in different and non-overlapping ID mapping. It requires to implement an algorithm that performs that allocation. There are some open questions about it:
+  The `Pod` mode requires to have each pod in different and non-overlapping ID
+  mapping. It requires to implement an algorithm that performs that allocation.
+  There are some open questions about it:
     - What should be the length of the mapping assigned to each pod?
     - How to get the ID mapping range of a running pod when kubelet crashes?
     - Can the user specify the ID mappings for a pod?
@@ -580,12 +588,12 @@ required) or even code snippets. If there's any ambiguity about HOW your
 proposal will be implemented, this is the place to discuss them.
 -->
 
-
 This section only focuses on phase 1 as specified above.
 
 ### Summary of the Proposed Changes
 
-- Extend the CRI to have a user namespace mode and the user and group ID mappings.
+- Extend the CRI to have a user namespace mode and the user and group ID
+  mappings.
 - Add a `userNamespaceMode` field to the pod spec.
 - Add the cluster-wide ID mappings to the kubelet configuration file.
 - Add a `UserNamespacesSupport` feature flag to enable / disable the user
@@ -595,13 +603,12 @@ This section only focuses on phase 1 as specified above.
 
 ### CRI API Changes
 
-The CRI is extended to (optionally) specify the user namespace mode
-and the ID mappings for a pod.
+The CRI is extended to (optionally) specify the user namespace mode and the ID
+mappings for a pod.
 [`NamespaceOption`](https://github.com/kubernetes/cri-api/blob/1eae59a7c4dee45a900f54ea2502edff7e57fd68/pkg/apis/runtime/v1alpha2/api.proto#L228)
 is extended with two new fields:
 - A `user` `NamespaceMode` that defines if the pod should run in an independent
-  user namespace (`POD`) or if it should share the host user namespace
-  (`NODE`).
+  user namespace (`POD`) or if it should share the host user namespace (`NODE`).
 - The ID mappings to be used if the user namespace mode is `POD`.
 
 ```
@@ -690,8 +697,9 @@ type PodSecurityContext struct {
 
 ### Configuring the Cluster ID Mappings
 
-This proposal considers two different ways to configure the ID mappings used for the `Cluster` mode.
-This is for discussion with the community and only one will be considered.
+This proposal considers two different ways to configure the ID mappings used for
+the `Cluster` mode. This is for discussion with the community and only one will
+be considered.
 
 <<[UNRESOLVED where to configure the cluster wide ID mappings ]>>
 
@@ -741,7 +749,8 @@ This option considers setting this parameter on the kube-apiserver.
 
  **Cons**:
  - It's difficult to expose this parameter to the kubelet.
- - The parameter could not be available for the kubelet if the kube-apiserver is down.
+ - The parameter could not be available for the kubelet if the kube-apiserver is
+   down.
 
 <<[/UNRESOLVED]>>
 
@@ -783,8 +792,8 @@ Ephemeral volumes use
 [`AtomicWriter`](https://github.com/kinvolk/kubernetes/blob/master/pkg/volume/util/atomic_writer.go)
 to create the files that are mounted to the containers. This component [has some
 logic](https://github.com/kinvolk/kubernetes/blob/c94242a7b1d238cc27aea9b6d45ccb9963e814bb/pkg/volume/util/atomic_writer.go#L403)
-to update the ownership of those files in some cases. It will be extended to take
-the ID mappings into consideration when the pod runs in `Cluster` mode.
+to update the ownership of those files in some cases. It will be extended to
+take the ID mappings into consideration when the pod runs in `Cluster` mode.
 
 ### Test Plan
 
@@ -912,18 +921,19 @@ enhancement:
   CRI or CNI may require updating that component before the kubelet.
 -->
 
-The container runtime will have to be updated in the nodes to support this feature.
+The container runtime will have to be updated in the nodes to support this
+feature.
 
 The new `user` field in the `NamespaceOption` will be ignored by an old runtime
 without user namespaces support. The container will be placed in the host user
 namespace. It's a responsibility of the user to guarantee that a runtime
 supporting user namespaces is used when this feature is enabled.
 
-An old version of kubelet (without user namespaces support) used with a new container runtime (with user namespaces support) can cause some
-issues too. In this case the runtime can wrongly infer that the `user` field
-is set to `POD` in the `NamespaceOption` message. To avoid this problem the
-runtime should check if the `mappings` field contains any mappings, an error
-should be raised otherwise.
+An old version of kubelet (without user namespaces support) used with a new
+container runtime (with user namespaces support) can cause some issues too. In
+this case the runtime can wrongly infer that the `user` field is set to `POD` in
+the `NamespaceOption` message. To avoid this problem the runtime should check if
+the `mappings` field contains any mappings, an error should be raised otherwise.
 
 ## Production Readiness Review Questionnaire
 
@@ -963,11 +973,11 @@ you need any help or guidance.
 
 * **Can the feature be disabled once it has been enabled (i.e. can we roll back
   the enablement)?**
-  Yes, the `UserNamespacesSupport` feature gate has to be disabled and pods running in `Cluster` and `Pod` mode have to be recreated.
-  The effective user and group IDs of the processes would be different
-  before and after disabling the feature for pods running in `Cluster` and `Pod`
-  modes. This can cause access issues to pods accessing files saved in
-  volumes.
+  Yes, the `UserNamespacesSupport` feature gate has to be disabled and pods
+  running in `Cluster` and `Pod` mode have to be recreated. The effective user
+  and group IDs of the processes would be different before and after disabling
+  the feature for pods running in `Cluster` and `Pod` modes. This can cause
+  access issues to pods accessing files saved in volumes.
 
 * **What happens if we reenable the feature if it was previously rolled back?**
   The situation is very similar to the described above. The pod will be able to
@@ -1089,20 +1099,20 @@ proposal there are some big differences:
 This proposal intends to have `Host` instead of `Pod` as default value for the
 user namespace mode. The rationale behind this decision is that it avoids
 breaking existing workloads that don't work with user namespaces. We are aware
-that this decision has the drawback that pods that don't set the `userNamespaceMode`
-will not have the security advantages of user namespaces, however we consider
-it's more important to keep compatibility with previous workloads.
+that this decision has the drawback that pods that don't set the
+`userNamespaceMode` will not have the security advantages of user namespaces,
+however we consider it's more important to keep compatibility with previous
+workloads.
 
 ### Host Defaulting Mechanishm
 
 Previous proposals like [Node-Level UserNamespace
 implementation](https://github.com/kubernetes/kubernetes/pull/64005) had a
-mechanism to default to the host user namespace when the pod specification includes
-features that could be not compatible with user namespaces (similar to [Default host user
-namespace via experimental
-flag](https://github.com/kubernetes/kubernetes/pull/31169)).
-This proposal doesn't require a similar mechanishm given that the default mode
-is `Host`.
+mechanism to default to the host user namespace when the pod specification
+includes features that could be not compatible with user namespaces (similar to
+[Default host user namespace via experimental
+flag](https://github.com/kubernetes/kubernetes/pull/31169)). This proposal
+doesn't require a similar mechanishm given that the default mode is `Host`.
 
 ## References
 
