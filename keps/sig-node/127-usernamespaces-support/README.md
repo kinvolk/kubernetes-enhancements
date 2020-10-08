@@ -963,8 +963,8 @@ you need any help or guidance.
 
 * **Can the feature be disabled once it has been enabled (i.e. can we roll back
   the enablement)?**
-  Yes, by disabling the `UserNamespacesSupport` feature gate.
-  The effective user and group IDs of the process in the host would be different
+  Yes, the `UserNamespacesSupport` feature gate has to be disabled and pods running in `Cluster` and `Pod` mode have to be recreated.
+  The effective user and group IDs of the processes would be different
   before and after disabling the feature for pods running in `Cluster` and `Pod`
   modes. This can cause access issues to pods accessing files saved in
   volumes.
