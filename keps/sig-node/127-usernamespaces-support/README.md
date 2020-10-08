@@ -919,7 +919,7 @@ without user namespaces support. The container will be placed in the host user
 namespace. It's a responsibility of the user to guarantee that a runtime
 supporting user namespaces is used when this feature is enabled.
 
-An old version of kubelet without user namespaces support can cause some
+An old version of kubelet (without user namespaces support) used with a new container runtime (with user namespaces support) can cause some
 issues too. In this case the runtime can wrongly infer that the `user` field
 is set to `POD` in the `NamespaceOption` message. To avoid this problem the
 runtime should check if the `mappings` field contains any mappings, an error
