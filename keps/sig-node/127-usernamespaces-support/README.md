@@ -488,17 +488,19 @@ The current implementation in container runtimes is to recursively perform a
 as it potentially increases the time and the storage needed to handle the
 container images.
 
-Some runtimes, like cri-o, mitigate these problems by using the `metacopy`
-option of overlayfs. This option avoids copying the whole file content when an
-operation updating only the metadata, like `chown` or `chmod`, is performed.
-This solution could be adopted by other runtimes until a more sophisticated
-approach is implemented in the kernel. [We
-talked](https://lists.linuxfoundation.org/pipermail/containers/2020-September/042230.html)
-to the Linux kernel community and [they
-replied](https://lists.linuxfoundation.org/pipermail/containers/2020-September/042230.html)
-they are working on a solution for it. If the Linux kernel provides a solution
-for this problem, that would be something that container runtimes should use. It
-does not impact the kubelet nor the CRI gRPC spec.
+[containers/storage](https://github.com/containers/storage/) used by CRI-O
+mounts an overlay file system with the
+[`metacopy=on`](https://www.kernel.org/doc/html/latest/filesystems/overlayfs.html#metadata-only-copy-up)
+flag set, it then chowns all of the lower files in the image to match the user
+namespace to which the container will run. This operation is very quick compared
+to standard chowning, since none of the files data has to be copied up. If a
+second container runs on the same image with the same user namespace, then the
+chowned image is shared, eliminating the need to chown again.
+
+More sophisticated approaches to this problem are being
+[discussed](https://lists.linuxfoundation.org/pipermail/containers/2020-September/042230.html)
+in the kernel community. This is something that container runtimes should use
+once it's available and it does not impact the kubelet nor the CRI gRPC spec.
 
 #### Container Images with High IDs
 
