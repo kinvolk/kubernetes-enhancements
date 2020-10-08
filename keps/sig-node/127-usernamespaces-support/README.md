@@ -296,7 +296,7 @@ specification with a new `userNamespaceMode` field. This field can have 3 values
   set.
 
 - **Cluster**:
-  All the pods in the cluster are placed in a different user namespace but they
+  All the pods in the cluster are placed in a _unique_ user namespace but they
   use the same ID mappings. This mode doesn't provide full pod-to-pod isolation
   as all the pods with `Cluster` mode have the same effective IDs on the host.
   It provides pod-to-host isolation as the IDs are different inside the
