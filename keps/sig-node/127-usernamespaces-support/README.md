@@ -201,7 +201,7 @@ place pods in different user namespaces increasing the  pod-to-pod and
 pod-to-host isolation. This extra isolation increases the cluster security as it
 protects the host and other pods from malicious or compromised processes inside
 containers that are able to break into the host. This KEP proposes three
-different modes: `Host` uses the host user namespace like the current behaviour, `Cluster` uses the same
+different modes: `Host` uses the host user namespace like the current behaviour, `Cluster` uses a unique user namespace per pod but the same
 ID mapping for all the pods (very similar to the previous [Support Node-Level User
 Namespaces
 Remapping](https://github.com/kubernetes/community/blob/master/contributors/design-proposals/node/node-usernamespace-remapping.md)
