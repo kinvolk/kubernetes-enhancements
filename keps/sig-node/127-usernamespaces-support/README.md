@@ -354,7 +354,7 @@ is run with a different mapping, i.e. the effective user and group IDs on the
 host change.
 
 This proposal supports volumes without changing the user and group IDs and
-leaves that problem to the user to manage. Future Linux kernel features such as
+leaves that problem for the user to manage. Future Linux kernel features such as
 shiftfs could allow different pods to see a volume with its own IDs but it is
 out of scope of this proposal. Among the possible future kernel solutions, we
 can list:
