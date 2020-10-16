@@ -415,7 +415,7 @@ that updates permissions and ownership of the files to be accesible by the
   CRI-O recently [added](https://github.com/cri-o/cri-o/pull/3944) support for
   user namespaces through a pod annotation. The extensions to make it work with
   the CRI changes proposed here are small.
-- gVisor, katacontainers: It's still to investigate.
+- gVisor, katacontainers: Yet to be investigated.
 
 containerd and cri-o will provide support for the 3 possible values of `userNamespaceMode`.
 
@@ -558,7 +558,7 @@ phase(s) but are not needed for phase 1, hence they are not discussed in detail:
   snapshots](#duplicated-snapshots-of-container-images) issue as it's possible
   that a pod uses a unique ID mapping each time it's scheduled. The different
   runtimes will have to use solutions like `metacopy` option of overlayfs or new
-  kernel features to overcome it. It's also likely that the garbage collection
+  kernel features to overcome it. It's also likely that the kubelet image garbage collection
   algorithm has to be changed as image snapshots shold be deleted as soon as the
   container finihes.
 - **ID Mappings Allocation Algorithm**
@@ -1036,7 +1036,7 @@ the existing API objects?** Yes. The PodSpec will be increased.
 * **Will enabling / using this feature result in increasing time taken by any
 operations covered by [existing SLIs/SLOs]?**
   Yes. The startup latency of both stateless and stateful pods is increased as
-  the rhe runtime has to set correct ownership for the container image before
+  the runtime has to set correct ownership for the container image before
   starting them.
 
 * **Will enabling / using this feature result in non-negligible increase of
