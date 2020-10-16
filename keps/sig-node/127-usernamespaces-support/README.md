@@ -407,7 +407,7 @@ that updates permissions and ownership of the files to be accesible by the
   deprecated]((https://github.com/kubernetes/enhancements/pull/1985/)) and it
   offers a very limited support for user namespaces.
 - **containerd**:
-  It's quite straigtforward to implement the CRI changes proposed below in
+  It's quite straightforward to implement the CRI changes proposed below in
   containerd/cri, we did it in
   [this](https://github.com/kinvolk/containerd-cri/commits/mauricio/userns_poc)
   PoC.
