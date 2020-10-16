@@ -773,6 +773,7 @@ Will be added before transition to beta.
 
 ## Implementation History
 
+- 2020-10-16: Initial proposal submitted.
 
 ## Drawbacks
 
